@@ -35,7 +35,8 @@
   比如 https://github.com/KingS770234358/MySpring<br/>
   OK -> push/force push即可（当push rejected的时候 force push->force push anyway）<br/>
 
-7.修改文件内容后，右键->git->commit file就可以把修改同步到GitHub上<br/>
-  
+7.修改文件内容后，右键->git->commit file->选择右下角brunch的local brunch然后push/右键选Git选repository然后push<br/>
+  就可以把修改同步到GitHub上<br/>
+  删除文件后，选择该文件所在目录，右键，Git，Commit Directory，然后push就可以在Github上也删除某个文件<br/>
 
-删除git配置，setting->version control 删除配置，同时删除本地文件（上面生成的.git文件夹）<br/>
+8.删除git配置，setting->version control 删除配置，同时删除本地文件（上面生成的.git文件夹）<br/>
