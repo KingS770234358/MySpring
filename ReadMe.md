@@ -37,3 +37,5 @@
   就可以把修改同步到GitHub上<br/>
   删除文件后，选择该文件所在目录，右键，Git，Commit Directory，然后push就可以在Github上也删除某个文件<br/>
 8.删除git配置，setting->version control 删除配置，同时删除本地文件（上面生成的.git文件夹）<br/>
+
+## IDEA File -> new Projects Setting -> settings for new projects可以配置对新项目的统一配置模板
