@@ -33,6 +33,7 @@
   弹窗中点击define remote为远程起名，并且配置远程的URL，这个URL就是GitHub上面项目的URL<br/>
   比如 https://github.com/KingS770234358/MySpring<br/>
   OK -> push/force push即可（当push rejected的时候 force push->force push anyway）<br/>
+  main XXX main 下展示的是所有的Commit，要把这些Commit push到GitHub端
 7.修改文件内容后，右键->git->commit file->选择右下角brunch的local brunch然后push/右键选Git选repository然后push
   就可以把修改同步到GitHub上<br/>
   删除文件后，选择该文件所在目录，右键，Git，Commit Directory，然后push就可以在Github上也删除某个文件<br/>
