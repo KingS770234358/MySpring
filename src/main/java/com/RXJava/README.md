@@ -95,4 +95,75 @@ TIPS:
                                          Subscriber  |    Publisher            Subscriber  |    Publisher        
                                                      <---------------------------------------------------------Subscription.request()
                                                    onNext-------------------------------------------------------------->
-                                                                                                                 
+
+7.RxJava反应式库
+  ·RxJava提供了两个版本的Flow.Publisher的实现：io.reactivex.Flowable类 和 io.reactivex.Observable类
+  ·io.reactivex.Flowable类：提供Java9 Flow中基于拉模式的背压特性，防止Subscriber被Publisher快速生成的大量数据压垮。
+   Subscriber可以通过request(Long.MAX_VALUE)的方式关闭背压功能（不建议）
+  ·io.reactivex.Observable类 不支持背压，适用于 不适合进行背压的场景，如用户接口事件（移动鼠标等），不适合通过背压进行反馈，对
+   事件的生产者进行背压，让ta慢点移动鼠标或者停止移动鼠标，以减缓或停止上游事件的生成。
+   当流元素个数不超过1k，或者正在处理基于图形用户界面的事件流，建议使用非背压版本的Observable作为Publisher。
+ 7.1 Observable的使用方式
+   ① Observable<String> strings = Observable.just("first", "second");
+   just()工厂方法可以将1个或多个元素转换为Observable，在适当的时候释放对应元素；
+   Subscriber会依次接受度奥onNext("first") onNext("second") 以及 onComplete()消息
+   ② Observable工厂方法（尤其是当应用需要与用户执行实时交互是，会按照固定的时间间隔发出事件）
+   Observable<Long> onePerSec = Observable.interval(1, TimeUnit.SECOND);
+   返回1个Observable，以指定的时间间隔发送1个由long类型组成的无限递增序列，由0开始计数。
+   可以使用onePerSec作为另1个Observable的基础，每个1秒反馈1次指定城市的温度报告
+ 7.2 Observer接口
+ public interface Observer<T>{
+    void onSubscribe(Disposable d);
+    void onNext(T t);
+    void onError(Throwable t);
+    void onComplete();
+ }
+ 7.3 快速订阅Observable:
+ 仅使用一个接收事件的Consumer 【i -> System.out.println(TempInfo.fetch("New York"))】
+ 实现 【onNext方法的】 Observer对象订阅1个Observable；
+ 其他onSubscriber、onError、onComplete方法都是用默认值
+ onePerSec.subscribe( i -> System.out.println(TempInfo.fetch("New York")))
+ 
+ 4.守护线程
+ 执行   Observable每隔指定时间间隔就发送1次数据  的线程是RxJava计算线程池中的守护线程
+ 直接把3中的语句放在main方法中执行，main程序执行完毕就立刻退出了，导致守护线程还没有产生任何输出就被终止了。
+ 解决方案：
+ 4.1 执行完3中代码后，让main线程进入sleep；
+ 4.2 使用blockingSubscribe方法调用当前线程（main函数所在线程）的回调函数。
+ onPerSec.blockingSubscribe( i -> System.out.println(TempInfo.fetch("New York")));
+ 
+ 5.ObservableEmitter 相当于不带onSubscribe方法的Observer
+ public interface ObservableEmitter{
+    void onNext(T t);
+    void onError(Throwable t);
+    void onComplete();
+ }
+ 定制功能更为丰富的 订阅者 ObservableEmitter
+ getTemperature===================================================================================> Observable
+ public static Observable<TempInfo> getTemperature(String town){                                        |
+     // Observable.create(ObservableOnSubscribe)                                                        |
+     // ObservableOnSubscribe中的subscribe(ObservableEmitter)方法通过传入1个ObservableEmitter创建1个        |
+     // Observable对象，进行订阅。                                                            Observer持有ObservableEmitter的引用
+     // ObservableEmitter 相当于不带onSubscribe方法的Observer                                              | 
+     return Observable.create(                                                                          |
+            // ======================== 以下是ObservableOnSubscribe的实现 ==========================> ObservableEmitter
+            // 传入1个 ObservableEmitter                                                                 |
+                emitter -> Observable.interval(1, TimeUnit.SECONDS).subscribe(                          |
+                           i->{                                                                         |
+                                if(!emitter.isDisposed()){                                              |
+                                   if(i>=5){                                                            |
+                                       emitter.onComplete();                                            |
+                                   }else{                                                               |
+                                       try {                                                            |
+                                           emitter.onNext(TempInfo.fetch("New York"));    ObservableEmitter持有Observer的引用
+                                       }catch (Exception e){                                            |
+                                           emitter.onError(e);                                          |
+                                       }                                                                |
+                                   }                                                                    |
+                                }                                                                       |
+                           }                                                                            |
+                   )                                                                                    |
+            // ======================== 以上是ObservableOnSubscribe的实现 ==========================      |  
+           );                                                                                           |
+ }                                                                                                      |
+ getTemperature("New York").blockingSubscribe(new TempObserver());=================================> Observer
