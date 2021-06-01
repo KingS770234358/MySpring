@@ -37,8 +37,13 @@ public class Main {
                     TownProcessor townProcessor = new TownProcessor();
                     townProcessor.subscribe(tempProcessor);
                     System.out.println("主线程：" + Thread.currentThread().getName());
-                    //     最上游的Publisher 委托给TempSubscription发布事件，指定其下游订阅者是tempProcessor
+                    //     最上游的Publisher 委托给TempSubscription发布事件，指定其直接下游订阅者是townProcessor
+                    // 而递归调用 townProcessor/subscriber.onSubscribe(Subscription) 的最后是最下游的Subscriber
+                    // 持有了这个 指定Publisher的直接下游是最上游的Processor 的new TempSubscription(townProcessor, town)
                     townProcessor.onSubscribe(new TempSubscription(townProcessor, town)); // Publisher - TempProcessor
+                    // 最下游的Subscriber持有了1个Subscription，而这个Subscription持有的Processor是最上游的Processor
+                    // 即最下游Subscriber对象持有的Subscription.request()方法中的onNext(T)方法是从最上游的Processor.onNext()方法开始执行
+
 /**
  * Publisher Processor Subscriber
  *         Subscription
