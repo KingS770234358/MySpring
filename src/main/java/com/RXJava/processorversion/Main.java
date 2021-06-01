@@ -7,15 +7,20 @@ import java.util.concurrent.Flow;
  * -> Subscriber.onSubscribe(Subscription(Subscribe, ...))
  * 递归开始...
  * -> Subscription.request()
+ * -> Subscription.TownProcessor.onNext()
+ * -> Subscription.TempProcessor.onNext()
  * -> Subscription.Subscriber.onNext()
  * -> Subscriber.Subscription.request()
- * -> Subscription.Subscriber.onNext()
- * -> Subscriber.Subscription.request()
- * ...
  * 递归结束
- * -> Subscription.cancel() -> Subscription.Subscriber.onComplete()
+ * -> Subscription.cancel()
+ * -> Subscription.TownProcessor.onComplete()
+ * -> Subscription.TempProcessor.onComplete()
+ * -> Subscription.Subscriber.onComplete()
  * 或者
- * -> Subscription.request() -> Subscription.Subscriber.onError()
+ * -> Subscription.request()
+ * -> Subscription.TownProcessor.onError()
+ * -> Subscription.TempProcessor.onError()
+ * -> Subscription.Subscriber.onError()
  */
 
 public class Main {
