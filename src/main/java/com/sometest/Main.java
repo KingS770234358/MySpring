@@ -4,6 +4,11 @@ import java.util.concurrent.Executor;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+/**
+ * 每个线程调用单例对象的成员方法，该成员方法中只存在局部变量，不存在单例的成员变量
+ * 这种情况下，每个线程调用单例对象成员方法时，该方法中的局部变量保存在各线程各自的工作内存（栈）中
+ * 方法局部变量不会发生在线程之间共享的情况。
+ */
 public class Main {
     public static void main(String[] args) {
         /*
