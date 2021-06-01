@@ -87,4 +87,12 @@ TIPS:
   onNext 和 request 之间存在递归， 被Subscriber.onComplete或者Subscriber.onError终结;
   Subscription可以视为 数据的提供方
   
-  
+6.Processor
+  Processor 先是1个Subscriber，再是1个Publisher。
+  它要先以Subscriber的身份注册到某个Publisher中，
+  接收处理完该Publisher发送的数据之后，再以Publisher的身份把处理完的数据再发送出去
+  数据大致流动方向：Publisher       ->              TownProcessor       ->  ...  ->     TempProcessor          ->        Subscriber
+                                         Subscriber  |    Publisher            Subscriber  |    Publisher        
+                                                     <---------------------------------------------------------Subscription.request()
+                                                   onNext-------------------------------------------------------------->
+                                                                                                                 

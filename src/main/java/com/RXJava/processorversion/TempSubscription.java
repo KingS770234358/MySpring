@@ -1,4 +1,4 @@
-package com.RXJava.twothreadversion;
+package com.RXJava.processorversion;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -15,6 +15,7 @@ public class TempSubscription implements Flow.Subscription {
 
     private final Flow.Subscriber<? super TempInfo> subscriber;
     private final String town;
+    private int cnt = 0;
 
     private final ExecutorService executorService = Executors.newSingleThreadExecutor(); // 单线程的线程池
 
@@ -25,20 +26,25 @@ public class TempSubscription implements Flow.Subscription {
 
     @Override
     public void request(long l) {
-        System.out.println("Subscription.request外部线程：" + Thread.currentThread().getName());
-        executorService.submit(()->{ // 开启另外1个线程 发送数据给Subscriber
-            for (long i = 0L; i < l; i++){
-                System.out.println("Subscription.request内部线程：" + Thread.currentThread().getName());
-                try {
-                    // 产生温度信息TempInfo ，调用subscriber的onNext方法处理
-                    System.out.println("最上游的温度发布者");
-                    subscriber.onNext(TempInfo.fetch( town )); // 向Subscriber发送指定城市的温度
-                } catch (Exception e) {
-                    subscriber.onError(e); // 查询温度时发生异常，向Subscriber发送异常
-                    break; // 中断
+        this.cnt++;
+        if(this.cnt > 10){
+            this.cancel();
+            executorService.shutdown();
+        }else{
+            System.out.println("Subscription.request外部线程：" + Thread.currentThread().getName());
+            executorService.submit(()->{ // 开启另外1个线程 发送数据给Subscriber
+                for (long i = 0L; i < l; i++){
+                    System.out.println("========Subscription.request内部线程：" + Thread.currentThread().getName() + "=========");
+                    try {
+                        // 产生温度信息TempInfo ，调用subscriber的onNext方法处理
+                        subscriber.onNext(TempInfo.fetch( town )); // 向Subscriber发送指定城市的温度
+                    } catch (Exception e) {
+                        subscriber.onError(e); // 查询温度时发生异常，向Subscriber发送异常
+                        break; // 中断
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     @Override
