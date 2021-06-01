@@ -5,5 +5,6 @@ public class ColorsTest {
         for (Colors value : Colors.values()) {
             System.out.println(value + ":" + value.getValue() + " " + value.isRest());
         }
+        System.out.println(Colors.getColorById(2));
     }
 }

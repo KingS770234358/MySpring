@@ -17,4 +17,13 @@ public enum Colors {
     public boolean isRest(){
         return false;
     }
+
+    public static Colors getColorById(int id){
+        for (Colors value : Colors.values()) {
+            if(value.getValue() == id){
+                return value;
+            }
+        }
+        return null;
+    }
 }
