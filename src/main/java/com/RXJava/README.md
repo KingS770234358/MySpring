@@ -146,7 +146,7 @@ TIPS:
      // Observable对象，进行订阅。                                                            Observer持有ObservableEmitter的引用
      // ObservableEmitter 相当于不带onSubscribe方法的Observer                                              | 
      return Observable.create(                                                                          |
-            // ======================== 以下是ObservableOnSubscribe的实现 ==========================> ObservableEmitter
+            // ======================== 以下是ObservableOnSubscribe的实现 ==========================> ObservableEmitter(类似Subscription)
             // 传入1个 ObservableEmitter                                                                 |
                 emitter -> Observable.interval(1, TimeUnit.SECONDS).subscribe(                          |
                            i->{                                                                         |
