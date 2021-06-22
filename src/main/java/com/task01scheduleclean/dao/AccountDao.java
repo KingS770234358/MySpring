@@ -16,7 +16,7 @@ public interface AccountDao {
             @Result(property = "consumer", column = "consumerId", // 这里的column要和数据库中的字段相同
                     // one 属性描述多对一/一对一的关系，一个账户只属于一个消费者，使用@One注解指定如何查找该消费者，
                     // fetchType是该字段初始化的方式， 有 LAZY EAGER 和 DEFAULT三种取值 多对一/一对一的时候选择EAGER
-                    one = @One(select = "com.task01scheduleclean.dao.ConsumerMapper.getConsumerById", fetchType = FetchType.EAGER))
+                    one = @One(select = "com.task01scheduleclean.dao.ConsumerDao.getConsumerById", fetchType = FetchType.EAGER))
     })
     Account getAccountById(int id);
 
