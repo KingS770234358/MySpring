@@ -18,10 +18,10 @@ public class MySchedulerJob {
 
     @Scheduled(cron="*/1 * * * * ?")
     public void jobTest(){
-        SqlSession sqlSession = sqlSessionFactory.openSession();
-        ConsumerDao consumerDao = sqlSession.getMapper(ConsumerDao.class);// 使用SqlSession获取Dao的代理对象
-        List<Consumer> all = consumerDao.getAll();
-        System.out.println(all.get(0));
+//        SqlSession sqlSession = sqlSessionFactory.openSession();
+//        ConsumerDao consumerDao = sqlSession.getMapper(ConsumerDao.class);// 使用SqlSession获取Dao的代理对象
+//        List<Consumer> all = consumerDao.getAll();
+//        System.out.println(all.get(0));
 
         /*
         String filePath = "E:\\workspace\\MySpring\\src\\main\\resources\\schedulerTest.txt";

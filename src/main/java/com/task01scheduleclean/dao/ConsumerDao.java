@@ -5,7 +5,7 @@ import com.task01scheduleclean.provider.ConsumerProvider;
 import com.task01scheduleclean.provider.ConsumerProvider2;
 import org.apache.ibatis.annotations.*;
 import org.apache.ibatis.mapping.FetchType;
-import org.springframework.jmx.export.annotation.ManagedMetric;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +13,7 @@ import java.util.Date;
 import java.util.List;
 
 @Mapper
+@Component
 @CacheNamespace(blocking = true) // blocking 默认为false 不开启二级缓存
 public interface ConsumerDao {
 
@@ -44,7 +45,36 @@ public interface ConsumerDao {
 
     @Select("SELECT id from consumer where birthday <= #{date}")
     @ResultMap(value = {"consumerToDB"})
-    List<Consumer> getConsumerByBirthday(String date);
+    String[] getConsumerByBirthday(String date);
+
+    @Select("SELECT id from consumer where birthday <= date_add(now(), interval - #{interval} minute) limit #{limitation}")
+    // 这里返回的是int[]数组，不能再使用如下@ResultMap了
+    // @ResultMap(value = {"consumerToDB"})
+    // 否则报错 java.lang.IllegalArgumentException: argument type mismatch
+    int[] getConsumerIdsByBirthdayWithLimitation(int interval, int limitation);
+
+    // 方式一、先查后删
+    @Delete("<script>" +
+                "DELETE from consumer where" +
+                "<foreach collection='cIds' item='cId' separator=' or '>" +
+                    "id=#{cId}" +
+                "</foreach>" +
+            "</script>")
+    int deleteBatch(@Param("cIds")int[] cIds);
+
+    @Delete("<script>" +
+            "DELETE from consumer where id in" +
+            "<foreach collection='cIds' item='cId' separator=',' open='(' close=')'>" +
+            "#{cId}" +
+            "</foreach>" +
+            "</script>")
+    int deleteBatch2(@Param("cIds")int[]cIds);
+    // 方式二、查完即删
+    @Delete("DELETE FROM consumer WHERE id in (SELECT a.cId from (SELECT id as cId from consumer " +
+            // 在#{}中指定jdbcType进行 java的Date类型到jdbc TIMESTAMP的转换 这样才能比较
+            "where birthday <= #{date,jdbcType=TIMESTAMP} limit #{limitation}) as a)")
+    int deleteBatch3(Date date, int limitation);
+
 
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     // 查询时使用动态SQL - SelectProvider
@@ -90,6 +120,21 @@ public interface ConsumerDao {
 
 
     // 新增
+
+    /**
+     * 批量新增
+     * @param consumers
+     * @return
+     */
+    @Insert("<script> " +
+            "insert into consumer " +
+            "(name, address, sex, birthday) " +
+            "values " +
+            "<foreach collection='consumers' item='consumer' separator=','>" +
+            "(#{consumer.consumerName},#{consumer.address},#{consumer.sex},#{consumer.birthday})"+
+            "</foreach> " +
+            "</script>")
+    int batchInsert(@Param("consumers") List<Consumer> consumers);
     @Insert("insert into consumer(id, name,address,sex,birthday) values(#{id}, #{consumerName}, #{address},#{sex},#{birthday})")
     /**
      * 对于SelectKey的理解：
@@ -104,7 +149,7 @@ public interface ConsumerDao {
 
     // 删除
     @Delete("DELETE FROM consumer WHERE id =#{id}")
-    void delete(int id);
+    int delete(int id);
     // 表的嵌套 == 再看看代码的DAO
     @Delete("DELETE FROM consumer WHERE id in (SELECT a.cId from (SELECT id as cId from consumer " +
             // 在#{}中指定jdbcType进行 java的Date类型到jdbc TIMESTAMP的转换 这样才能比较
