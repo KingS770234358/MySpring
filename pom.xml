@@ -25,6 +25,7 @@
     </properties>
     <dependencies>
 
+        <!-- checkstyle相关依赖 -->
         <!-- https://mvnrepository.com/artifact/com.puppycrawl.tools/checkstyle -->
         <dependency>
             <groupId>com.puppycrawl.tools</groupId>
