@@ -28,6 +28,10 @@ spring:
     maxPoolPreparedStatementPerConnectionSize: 20
     useGlobalDataSourceStat: true
     connectionProperties: druid.stat.mergeSql=true;druid.stat.slowSqlMillis=500
+    #dbcp2:
+      #default-auto-commit: false
+      #default-transaction-isolation: 2
+      #enableAutocommitOnReturn: false
 
 ## 整合Mybatis
 mybatis:
@@ -39,3 +43,4 @@ mybatis:
   # config-location:
   configuration:
     cache-enabled: true
+

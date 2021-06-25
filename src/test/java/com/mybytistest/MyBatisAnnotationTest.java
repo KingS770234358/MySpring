@@ -5,6 +5,7 @@ import com.task01scheduleclean.dao.AccountDao;
 import com.task01scheduleclean.dao.ConsumerDao;
 import com.task01scheduleclean.pojo.Account;
 import com.task01scheduleclean.pojo.Consumer;
+import com.task01scheduleclean.service.DaoService;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.After;
@@ -15,6 +16,7 @@ import org.springframework.context.ApplicationContext;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Calendar;
 import java.util.List;
@@ -24,12 +26,14 @@ public class MyBatisAnnotationTest {
     private SqlSessionFactory sqlSessionFactory;
     private SqlSession sqlSession;
     private ConsumerDao consumerDao;
+    private DaoService daoService;
     @Before
     public void getDaoProxy(){
         ApplicationContext ac = SpringApplication.run(SchedulerApplication.class);
         this.sqlSessionFactory = ac.getBean(SqlSessionFactory.class); // SqlSessionFactory工厂
         this.sqlSession = this.sqlSessionFactory.openSession(); // SqlSession
         this.consumerDao = sqlSession.getMapper(ConsumerDao.class);// 使用SqlSession获取Dao的代理对象
+        this.daoService = ac.getBean(DaoService.class);
     }
     @After
     public void closeSqlSession(){
@@ -37,51 +41,87 @@ public class MyBatisAnnotationTest {
     }
 
     /**
+     * 事务测试
+     */
+    @Test
+    public void transactionTest() throws InterruptedException {
+
+        Consumer c1 = new Consumer(0,"nnnnnnnnnnnnnnn","fz","nan",new Date());
+//        Consumer c2 = new Consumer(0,"xq11","fz","nv",new Date());
+//        Consumer c3 = new Consumer(0,"mm11","fz","nv",new Date());
+        List<Consumer> consumers = new ArrayList<>();
+        consumers.add(c1);
+//        consumers.add(c2);
+//        consumers.add(c3);
+        this.daoService.insert(consumers);
+    }
+
+    /**
      * 耗时测试
      */
     @Test
     public void consumeTimeTestInsert(){
-        //this.sqlSession = this.sqlSessionFactory.openSession(ExecutorType.BATCH); // SqlSession
-        //this.consumerMapper = this.sqlSession.getMapper(ConsumerMapper.class);// 使用SqlSession获取Dao的代理对象
-        for(int i=0; i<80000; i++){
-            consumerDao.insert(new Consumer(0, "wqiang" + i, "suzhou" + i, "男", new Date()));
+        // this.sqlSession = this.sqlSessionFactory.openSession(false); // SqlSession
+        // this.consumerDao = this.sqlSession.getMapper(ConsumerDao.class);// 使用SqlSession获取Dao的代理对象
+        List<Consumer> consumers = new ArrayList<>();
+        for(int i=0; i<300000; i++){
+            consumers.add(new Consumer(0, "wqiang" + i, "suzhou" + i, "男", new Date()));
+            if((i+1)%1000 == 0){
+                this.consumerDao.batchInsert(consumers);
+                consumers.clear();
+            }
         }
-        sqlSession.commit();
+        // sqlSession.commit();
     }
+    /**
+     * 先查后删
+     * 开启事务 逐个删除 最后提交事务
+     */
     @Test
-    public void timeTest(){
-        Instant startTime = Instant.now();
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
+    public void deleteOneByOneThenCommit() {
+        int delNum = Integer.MAX_VALUE;
+        int limitation = 3000;
+        while(delNum>=limitation){
+            int[] cIds = consumerDao.getConsumerIdsByBirthdayWithLimitation(1, limitation);
+            System.out.println("查到：" + cIds.length + "条数据。");
+            delNum = daoService.delete(cIds);
+            System.out.println("删除：" + delNum + "条数据。");
         }
-        Instant endTime = Instant.now();
-        System.out.println("开始时间：" + startTime);
-        System.out.println("结束时间：" + endTime);
-        System.out.println("运行时间：" + Duration.between(startTime, endTime));
-    }
-    @Test
-    public void deleteInRange8w(){
-        Instant startTime = Instant.now();
-        consumerDao.deleteRange(new Date());
-        Instant endTime = Instant.now();
-        // 1.1239923S
-        System.out.println("开始时间：" + startTime + " " + "结束时间：" + endTime + " " + "运行时间：" + Duration.between(startTime, endTime));
-    }
-    public void deleteAll8w(){
-        Instant startTime = Instant.now();
-        consumerDao.deleteAll();
-        Instant endTime = Instant.now();
-        // 1.1239923S
-        System.out.println("开始时间：" + startTime + " " + "结束时间：" + endTime + " " + "运行时间：" + Duration.between(startTime, endTime));
     }
     /**
      * 按范围删除
      */
     @Test
     public void deleteInRange(){
-        consumerDao.deleteRange(new Date(Calendar.getInstance().getTimeInMillis()));
+        int delNum = Integer.MAX_VALUE;
+        int limitation = 100000;
+        Instant startTime = Instant.now();
+        while(delNum>=limitation){
+            delNum = consumerDao.deleteBatch3(new Date(Calendar.getInstance().getTimeInMillis()), limitation);
+            // System.out.println(delNum);
+        }
+        Instant endTime = Instant.now();
+        // 18.8s 18.27 17.21
+        System.out.println("开始时间：" + startTime + " " + "结束时间：" + endTime + " " + "运行时间：" + Duration.between(startTime, endTime));
+    }
+
+    @Test
+    public void deleteInRange2(){
+        // int delNum = Integer.MAX_VALUE;
+        int limitation = 1000; // 先查后删 limitation不能太大
+        Instant startTime = Instant.now();
+        // int[] cIds = consumerDao.getConsumerIdsByBirthdayWithLimitation(1, limitation);
+        while(true){
+            int[] cIds = consumerDao.getConsumerIdsByBirthdayWithLimitation(1, limitation);
+            if(cIds.length!=0){ // 这里一定要判断cIds数组是否为空，否则 <script>的拼接会出语法错误
+                consumerDao.deleteBatch(cIds); // 1-40s 31s   2-25.5 30.58
+            }else{
+                break;
+            }
+            // System.out.println(delNum);
+        }
+        Instant endTime = Instant.now();
+        System.out.println("开始时间：" + startTime + " " + "结束时间：" + endTime + " " + "运行时间：" + Duration.between(startTime, endTime));
     }
 
     /**
