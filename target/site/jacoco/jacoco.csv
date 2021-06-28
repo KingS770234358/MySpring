@@ -1,0 +1,7 @@
+GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
+MySpring,com.wqiang.service,OrderService,3,0,0,0,1,0,1,0,1,0
+MySpring,com.wqiang.service,UnscannableClass,3,0,0,0,1,0,1,0,1,0
+MySpring,com.wqiang.service,UserServiceImpl,40,0,0,0,11,0,6,0,6,0
+MySpring,com.wqiang.service,WqiangBeanPostProcessor,39,0,4,0,11,0,5,0,3,0
+MySpring,com.wqiang.service,WqiangBeanPostProcessor.new InvocationHandler() {...},23,0,0,0,5,0,2,0,2,0
+MySpring,com.task01scheduleclean.service,DaoService,0,76,0,4,0,14,0,5,0,3

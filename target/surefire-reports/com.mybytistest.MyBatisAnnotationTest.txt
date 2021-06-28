@@ -1,0 +1,12 @@
+-------------------------------------------------------------------------------
+Test set: com.mybytistest.MyBatisAnnotationTest
+-------------------------------------------------------------------------------
+Tests run: 18, Failures: 0, Errors: 2, Skipped: 0, Time elapsed: 62.122 s <<< FAILURE! - in com.mybytistest.MyBatisAnnotationTest
+getFuzzyTest(com.mybytistest.MyBatisAnnotationTest)  Time elapsed: 0.294 s  <<< ERROR!
+java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+	at com.mybytistest.MyBatisAnnotationTest.getFuzzyTest(MyBatisAnnotationTest.java:235)
+
+getAllTest(com.mybytistest.MyBatisAnnotationTest)  Time elapsed: 0.241 s  <<< ERROR!
+java.lang.IndexOutOfBoundsException: Index 0 out of bounds for length 0
+	at com.mybytistest.MyBatisAnnotationTest.getAllTest(MyBatisAnnotationTest.java:230)
+

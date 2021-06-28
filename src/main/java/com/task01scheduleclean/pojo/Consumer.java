@@ -20,12 +20,15 @@ public class Consumer implements Serializable {
     private String sex;
     private Date birthday;
     private List<Account> accountList;
-    public Consumer(int id, String consumerName, String address, String sex, Date birthday){
+    public Consumer(int id, String consumerName, String address, String sex, Date birthday) {
         this.id = id;
         this.consumerName = consumerName;
         this.address = address;
         this.sex = sex;
         this.birthday = birthday;
+    }
+    public String getSexByInt4MockitTest(int sex) {
+        return sex == 1 ? "男" : "女";
     }
 
 }

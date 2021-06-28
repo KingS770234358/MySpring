@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WqiangBeanPostProcessor.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.wqiang.service</a> &gt; <span class="el_source">WqiangBeanPostProcessor.java</span></div><h1>WqiangBeanPostProcessor.java</h1><pre class="source lang-java linenums">package com.wqiang.service;
+
+import com.myspring.Annotation.Component;
+import com.myspring.BeanPostProcessor;
+
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+
+/***
+ * BeanPostProcess类对所有的bean的创建都有效
+ * 这里处于方便， 将其实现类一起放入service包下 方便扫描
+ */
+@Component(&quot;wqiangBeanPostProcessor&quot;) // BeanPostProcessor也要作为bean注册到spring容器中
+<span class="nc" id="L15">public class WqiangBeanPostProcessor implements BeanPostProcessor {</span>
+    @Override
+    public Object postProcessBeforeInitialization(Object bean, String beanName) {
+<span class="nc" id="L18">        System.out.println(&quot;初始化前...&quot;);</span>
+        // 对指定类型的bean进行操作
+<span class="nc bnc" id="L20" title="All 2 branches missed.">        if(&quot;userService&quot;.equals(beanName)){</span>
+<span class="nc" id="L21">            ((UserServiceImpl)bean).setName(&quot;自定义 特定bean的 BeanPostProcessor&quot;);</span>
+        }
+<span class="nc" id="L23">        return bean;</span>
+    }
+
+    @Override
+    public Object postProcessAfterInitialization(Object bean, String beanName) {
+<span class="nc" id="L28">        System.out.println(&quot;初始化后...&quot;);</span>
+        // 对指定类型的bean进行操作
+<span class="nc bnc" id="L30" title="All 2 branches missed.">        if(&quot;userService&quot;.equals(beanName)){</span>
+            // 生成指定类型的代理对象 实现AOP
+            // 使用当前BeanPostProcessor的类加载器进行加载
+<span class="nc" id="L33">            Object proxyInstance = Proxy.newProxyInstance(WqiangBeanPostProcessor.class.getClassLoader(),</span>
+<span class="nc" id="L34">                    bean.getClass().getInterfaces(), new InvocationHandler() {</span>
+                        @Override
+                        public Object invoke(Object o, Method method, Object[] objects) throws Throwable {
+                            // 先执行代理逻辑
+<span class="nc" id="L38">                            System.out.println(&quot;方法前代理逻辑&quot;);</span>
+                            // 再执行业务逻辑
+<span class="nc" id="L40">                            Object rtn = method.invoke(bean, objects);</span>
+                            // 最后执行代理逻辑
+<span class="nc" id="L42">                            System.out.println(&quot;方法后代理逻辑&quot;);</span>
+<span class="nc" id="L43">                            return rtn;</span>
+                        }
+                    });
+<span class="nc" id="L46">            return proxyInstance;</span>
+        }
+<span class="nc" id="L48">        return bean;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
