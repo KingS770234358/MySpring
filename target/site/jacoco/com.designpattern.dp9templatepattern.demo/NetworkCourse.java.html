@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>NetworkCourse.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.designpattern.dp9templatepattern.demo</a> &gt; <span class="el_source">NetworkCourse.java</span></div><h1>NetworkCourse.java</h1><pre class="source lang-java linenums">package com.designpattern.dp9templatepattern.demo;
+
+<span class="nc" id="L3">public abstract class NetworkCourse {</span>
+
+    // final保证方法不被重写 算法的整体骨架不变
+    protected final void createCourse(){
+
+<span class="nc" id="L8">        this.postPreResource(); // 分发预习资料..</span>
+<span class="nc" id="L9">        this.createPPT(); // 创建备课PPT...</span>
+<span class="nc" id="L10">        this.liveVideo(); // 在线直播...</span>
+<span class="nc" id="L11">        this.postNote();  // 提交笔记...</span>
+<span class="nc" id="L12">        this.postSouceCode(); // 提交源码...</span>
+
+<span class="nc bnc" id="L14" title="All 2 branches missed.">        if(needHomework()){  // 钩子方法，微调业务流程</span>
+<span class="nc" id="L15">            checkHomework(); // 待子类具体实现的步骤</span>
+        }
+<span class="nc" id="L17">    }</span>
+
+    // 待子类实现的抽象方法
+    abstract void checkHomework();
+
+    /*
+     * 【钩子方法】：实现流程的微调
+     * 钩子方法的主要目的是干预执行流程，使得控制行为更加灵活，更符合实际业务的需求。
+     * 钩子方法的返回值一般为适合条件分支语句的返回值
+     */
+<span class="nc" id="L27">    protected boolean needHomework(){return false;}</span>
+
+    // final 算法的固定部分不能被重写
+    final void postPreResource(){
+<span class="nc" id="L31">        System.out.println(&quot;分发预习资料..&quot;);</span>
+<span class="nc" id="L32">    }</span>
+    final void createPPT(){
+<span class="nc" id="L34">        System.out.println(&quot;创建备课PPT...&quot;);</span>
+<span class="nc" id="L35">    }</span>
+    final void liveVideo(){
+<span class="nc" id="L37">        System.out.println(&quot;在线直播...&quot;);</span>
+<span class="nc" id="L38">    }</span>
+    final void postNote(){
+<span class="nc" id="L40">        System.out.println(&quot;提交笔记...&quot;);</span>
+<span class="nc" id="L41">    }</span>
+    final void postSouceCode(){
+<span class="nc" id="L43">        System.out.println(&quot;提交源码...&quot;);</span>
+<span class="nc" id="L44">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

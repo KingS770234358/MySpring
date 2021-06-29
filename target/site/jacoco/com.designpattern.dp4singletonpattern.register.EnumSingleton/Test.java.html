@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Test.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.designpattern.dp4singletonpattern.register.EnumSingleton</a> &gt; <span class="el_source">Test.java</span></div><h1>Test.java</h1><pre class="source lang-java linenums">package com.designpattern.dp4singletonpattern.register.EnumSingleton;
+
+import java.io.*;
+
+/**
+ * Java 反编译工具 Jad（下载地址： https：//varaneckas.com/jad/）
+ *
+ * 线程安全：枚举式单例模式在静态代码块中就给INSTANCE进行了赋值，是饿汉式单例模式的实现。
+ *
+ * 序列化破坏：ObjectInputStream的readObject0（）方法，调用了readEnum（）方法，枚举类型其实通过
+ * 类名和类对象类找到一个唯一的枚举对象。因此，枚举对象不可能被类加载器加载多次。序列化不会破坏该方法的单例
+ *
+ * 反射破坏：java.lang.Enum只有一个protected类型的构造方法，没有无参的构造方法；使用反射强制访问构造方法构造枚举对象则
+ * “Cannot reflectively create enum objects”，在 newInstance（）方法中做了强制性的判断，如果修饰符是
+ * Modifier.ENUM枚举类型，则直接抛出异常。即不能用反射来创建枚举类型，反射无法破坏该方法的单例
+ *
+ *
+ */
+<span class="nc" id="L19">public class Test {</span>
+    public static void main(String[] args) {
+
+<span class="nc" id="L22">        EnumSingleton instance1 = null;</span>
+<span class="nc" id="L23">        EnumSingleton instance2 = EnumSingleton.getInstance();</span>
+<span class="nc" id="L24">        instance2.setData(new Object());</span>
+
+        try {
+<span class="nc" id="L27">            FileOutputStream fos = new FileOutputStream(&quot;EnumSingleton.obj&quot;);</span>
+<span class="nc" id="L28">            ObjectOutputStream oos = new ObjectOutputStream(fos);</span>
+<span class="nc" id="L29">            oos.writeObject(instance2);</span>
+<span class="nc" id="L30">            oos.flush();</span>
+<span class="nc" id="L31">            oos.close();</span>
+
+<span class="nc" id="L33">            FileInputStream fis = new FileInputStream(&quot;EnumSingleton.obj&quot;);</span>
+<span class="nc" id="L34">            ObjectInputStream ois = new ObjectInputStream(fis);</span>
+<span class="nc" id="L35">            instance1 = (EnumSingleton)ois.readObject();</span>
+<span class="nc" id="L36">            ois.close();</span>
+<span class="nc" id="L37">            System.out.println(instance2.getData());</span>
+<span class="nc" id="L38">            System.out.println(instance1.getData());</span>
+<span class="nc bnc" id="L39" title="All 2 branches missed.">            System.out.println(instance1.getData() == instance2.getData());</span>
+
+<span class="nc" id="L41">        } catch (Exception e) {</span>
+<span class="nc" id="L42">            e.printStackTrace();</span>
+<span class="nc" id="L43">        }</span>
+
+<span class="nc" id="L45">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

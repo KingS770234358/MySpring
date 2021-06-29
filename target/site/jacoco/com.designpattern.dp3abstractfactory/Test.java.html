@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Test.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.designpattern.dp3abstractfactory</a> &gt; <span class="el_source">Test.java</span></div><h1>Test.java</h1><pre class="source lang-java linenums">package com.designpattern.dp3abstractfactory;
+
+/**
+ * 抽象工厂模式
+ * 优点：完整地描述了两个产品族：Java课程和Python课程，也
+ * 描述了两个产品等级视频和笔记。
+ * 缺点：继续扩展产品等级，将源码Source也加入课程，那么代码从抽象工厂到具体工厂要全部调整，不符合开闭原则。
+ * （1）规定了所有可能被创建的产品集合，产品族中扩展新的产品困难，需要修改抽象工厂的接口。
+ * （2）增加了系统的抽象性和理解难度。
+ */
+<span class="nc" id="L11">public class Test {</span>
+    public static void main(String[] args) {
+
+<span class="nc" id="L14">        ICourseFactory factory = new JavaCourseFactory();</span>
+<span class="nc" id="L15">        IVideo video = factory.createVideo();</span>
+<span class="nc" id="L16">        INote note = factory.createNote();</span>
+<span class="nc" id="L17">        video.record();</span>
+<span class="nc" id="L18">        note.edit();</span>
+
+<span class="nc" id="L20">        factory = new PythonCourseFactory();</span>
+<span class="nc" id="L21">        video = factory.createVideo();</span>
+<span class="nc" id="L22">        note = factory.createNote();</span>
+<span class="nc" id="L23">        video.record();</span>
+<span class="nc" id="L24">        note.edit();</span>
+
+<span class="nc" id="L26">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

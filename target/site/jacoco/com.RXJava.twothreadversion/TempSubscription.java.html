@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TempSubscription.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.RXJava.twothreadversion</a> &gt; <span class="el_source">TempSubscription.java</span></div><h1>TempSubscription.java</h1><pre class="source lang-java linenums">package com.RXJava.twothreadversion;
+
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Flow;
+
+/**
+ * Subscription接口的实现 “某个城市温度的Subscription对象”
+ * ①request()的try     向Subscriber发送指定城市的温度
+ * ②request()的catch   向Subscriber发送异常
+ * ③cancel()           向Subscriber发送 onComplete 信号
+ * 在Subscriber请求温度报告时返回对应的数据
+ */
+public class TempSubscription implements Flow.Subscription {
+
+    private final Flow.Subscriber&lt;? super TempInfo&gt; subscriber;
+    private final String town;
+
+<span class="nc" id="L19">    private final ExecutorService executorService = Executors.newSingleThreadExecutor(); // 单线程的线程池</span>
+
+<span class="nc" id="L21">    public TempSubscription(Flow.Subscriber&lt;? super TempInfo&gt; subscriber, String town){</span>
+<span class="nc" id="L22">        this.subscriber = subscriber; // 持有subscriber的引用</span>
+<span class="nc" id="L23">        this.town = town;</span>
+<span class="nc" id="L24">    }</span>
+
+    @Override
+    public void request(long l) {
+<span class="nc" id="L28">        System.out.println(&quot;Subscription.request外部线程：&quot; + Thread.currentThread().getName());</span>
+<span class="nc" id="L29">        executorService.submit(()-&gt;{ // 开启另外1个线程 发送数据给Subscriber</span>
+<span class="nc bnc" id="L30" title="All 2 branches missed.">            for (long i = 0L; i &lt; l; i++){</span>
+<span class="nc" id="L31">                System.out.println(&quot;Subscription.request内部线程：&quot; + Thread.currentThread().getName());</span>
+                try {
+                    // 产生温度信息TempInfo ，调用subscriber的onNext方法处理
+<span class="nc" id="L34">                    System.out.println(&quot;最上游的温度发布者&quot;);</span>
+<span class="nc" id="L35">                    subscriber.onNext(TempInfo.fetch( town )); // 向Subscriber发送指定城市的温度</span>
+<span class="nc" id="L36">                } catch (Exception e) {</span>
+<span class="nc" id="L37">                    subscriber.onError(e); // 查询温度时发生异常，向Subscriber发送异常</span>
+<span class="nc" id="L38">                    break; // 中断</span>
+<span class="nc" id="L39">                }</span>
+            }
+<span class="nc" id="L41">        });</span>
+<span class="nc" id="L42">    }</span>
+
+    @Override
+    public void cancel() { // 如果调用subscription.cancel()，向Subscriber发送 onComplete 信号
+<span class="nc" id="L46">        subscriber.onComplete();</span>
+<span class="nc" id="L47">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

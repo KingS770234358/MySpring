@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>TempSubscriber.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.RXJava.processorversion</a> &gt; <span class="el_source">TempSubscriber.java</span></div><h1>TempSubscriber.java</h1><pre class="source lang-java linenums">package com.RXJava.processorversion;
+
+import java.util.concurrent.Flow;
+
+//                                     Subscriber 和 Subscription之间传输的 TempInfo
+<span class="nc" id="L6">public class TempSubscriber implements Flow.Subscriber&lt;TempInfo&gt; {</span>
+
+    private Flow.Subscription subscription;
+    public Flow.Subscription getSubscription(){
+<span class="nc" id="L10">        return this.subscription;</span>
+    }
+
+    @Override
+    public void onSubscribe(Flow.Subscription subscription) { // 在订阅的时候，Publisher调用该方法
+<span class="nc" id="L15">        this.subscription = subscription; // 回传Subscription对象给Subscriber</span>
+        // 订阅的时候就执行背压，限制Subscription/Publisher向Subscriber发送次数
+        // 执行1次 subscription.request() 方法，是指 向subscription发送第1个请求，
+        // subscription.request(1)中的方法参数1是指 ：
+        // subscription.request中的for循环只执行1次，即只执行1次subscriber.onNext(T)方法 —— 向Subscriber发送1次TempInfo
+<span class="nc" id="L20">        subscription.request(1);</span>
+<span class="nc" id="L21">    }</span>
+
+    @Override
+    public void onNext(TempInfo tempInfo) {
+<span class="nc" id="L25">        System.out.println(&quot;Subscriber线程：&quot; + Thread.currentThread().getName());</span>
+<span class="nc" id="L26">        System.out.println( tempInfo);  // 打印输出接收到的温度 —— 实际的1次业务逻辑</span>
+        // 执行1次 subscription.request() 方法， 向subscription发送1个请求。
+        // 参数中的1是指数据的份数，subscription.request中的for循环执行subscriber.onNext(T)的次数
+<span class="nc" id="L29">        subscription.request( 1);</span>
+<span class="nc" id="L30">    }</span>
+
+    @Override
+    public void onError(Throwable throwable) {
+<span class="nc" id="L34">        System.err.println(throwable.getMessage());</span>
+<span class="nc" id="L35">    }</span>
+
+    @Override
+    public void onComplete() {
+<span class="nc" id="L39">        System.out.println(&quot;Done!&quot;);</span>
+<span class="nc" id="L40">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

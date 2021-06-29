@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Test.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.designpattern.dp6proxypattern.dynamicproxy.cglibdynamicproxy</a> &gt; <span class="el_source">Test.java</span></div><h1>Test.java</h1><pre class="source lang-java linenums">package com.designpattern.dp6proxypattern.dynamicproxy.cglibdynamicproxy;
+
+/**
+ * Cglib动态代理：
+ * 代理类会获得所有从父类(被代理类)继承来的方法
+ * 并且会有 MethodProxy 与之对应，比如 Method CGLIB$findLove$0$Method、MethodProxy CGLIB$findLove$0$Proxy
+ * 这些方法在 代理类 的findLove（）方法中都有调用。
+ *
+ * 调用过程为：
+ * 代理对象调用 this.findLove（）方法 →调用拦截器 → methodProxy.invokeSuper
+ * → CGLIB$findLove$0 → 被代理对象findLove（）方法。
+ *
+ * FastClass提速：
+ * CGLib代理执行代理方法的效率之所以比JDK的高，是因为CGlib采用了FastClass机制，
+ * 为 代理类 和 被代理类 各生成一个类，这个类会为 代理类 或 被代理类 的方法分配一个index（int类型）；
+ * 这个index当作一个入参，FastClass就可以直接定位要调用的方法并直接进行调用，
+ * 省去了反射调用，所以调用效率比JDK代理通过反射调用高
+ * FastClass并不是跟代理类一起生成的，而是在第一次执行MethodProxy的invoke（）或invokeSuper（）方法时生成的，
+ * 并放在了缓存中。
+ *
+ *
+ */
+<span class="nc" id="L23">public class Test {</span>
+    public static void main(String[] args){
+
+        try {
+<span class="nc" id="L27">            Kid obj = (Kid)new Father().getProxyInstance(Kid.class);</span>
+<span class="nc" id="L28">            obj.eat();</span>
+<span class="nc" id="L29">        } catch (Exception e) {</span>
+<span class="nc" id="L30">            e.printStackTrace();</span>
+<span class="nc" id="L31">        }</span>
+
+<span class="nc" id="L33">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

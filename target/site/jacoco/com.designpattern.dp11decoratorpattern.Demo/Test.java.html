@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Test.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.designpattern.dp11decoratorpattern.Demo</a> &gt; <span class="el_source">Test.java</span></div><h1>Test.java</h1><pre class="source lang-java linenums">package com.designpattern.dp11decoratorpattern.Demo;
+
+/**
+ * 装饰器模式：
+ * 指在不改变原有对象的基础上，将功能附加到对象上，
+ * 提供了比继承更有弹性的方案（扩展原有对象的功能），属于结构型模式。
+ * *最本质的特征是将原有类的附加功能抽离出来，简化原有类的逻辑
+ *
+ * 适用场景：
+ * （1）扩展一个类的功能或给一个类添加附加职责。
+ * （2）动态给一个对象添加功能，【这些功能可以再动态地撤销】。
+ *
+ * 优点：
+ * （1）是继承的有力补充，且比继承灵活，可以在不改变原有对象的情况下【动态】地给一个对象扩展功能，即插即用。
+ * （2）使用不同的装饰类及这些装饰类的排列组合，可以实现不同的效果。
+ * （3）装饰者模式完全符合开闭原则。
+ * 缺点：
+ * （1）会出现更多的代码、更多的类，增加程序的复杂性。
+ * （2）动态装饰时，多层装饰会更复杂。
+ *
+ * 装饰器模式和适配器模式对比
+ *           装饰器模式                                   适配器模式
+ * 形式    特殊的适配器模式，有层级关系              适配器与被适配类之间没有层级关系
+ * 定义    装饰器和被装饰类实现同一个抽象类或接口     适配器与被适配类之间没有必然的联系，通常采用继承
+ *         主要目的：拓展之后保留OOP关系            或代理的形式进行包装
+ * 关系    满足is-a的关系                          满足has-a的关系
+ * 功能    注重覆盖、扩展                          注重兼容、转换
+ * 设计    前置考虑（前期）                        后置考虑（后期）
+ */
+<span class="nc" id="L30">public class Test {</span>
+    public static void main(String[] args) {
+        Battercake battercake;
+<span class="nc" id="L33">        battercake = new BaseBattercake(); // 最简单的煎饼</span>
+<span class="nc" id="L34">        System.out.println(battercake.getMsg() + &quot;, 总价格：&quot; + battercake.getPrice());</span>
+
+        // 加鸡蛋 (装饰器类也是 被装饰类一种，扩展了被装饰类的功能 可以直接返回给被装饰类接受)
+<span class="nc" id="L37">        battercake = new EggBattercakeDecorator(battercake);</span>
+<span class="nc" id="L38">        System.out.println(battercake.getMsg() + &quot;, 总价格：&quot; + battercake.getPrice());</span>
+
+        // 加香肠
+<span class="nc" id="L41">        battercake = new SausageBattercakeDecorator(battercake);</span>
+<span class="nc" id="L42">        System.out.println(battercake.getMsg() + &quot;, 总价格：&quot; + battercake.getPrice());</span>
+
+        // 再加鸡蛋
+<span class="nc" id="L45">        battercake = new EggBattercakeDecorator(battercake);</span>
+<span class="nc" id="L46">        System.out.println(battercake.getMsg() + &quot;, 总价格：&quot; + battercake.getPrice());</span>
+
+<span class="nc" id="L48">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

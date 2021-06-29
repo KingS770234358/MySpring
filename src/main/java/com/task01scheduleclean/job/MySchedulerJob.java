@@ -13,10 +13,13 @@ import java.util.List;
 @Component
 public class MySchedulerJob {
 
+    /**
+     * 用于访问数据库的SqlSessionFactory
+     */
     @Autowired
     private SqlSessionFactory sqlSessionFactory;
 
-    @Scheduled(cron="*/1 * * * * ?")
+    @Scheduled(cron = "*/1 * * * * ?")
     public void jobTest(){
 //        SqlSession sqlSession = sqlSessionFactory.openSession();
 //        ConsumerDao consumerDao = sqlSession.getMapper(ConsumerDao.class);// 使用SqlSession获取Dao的代理对象

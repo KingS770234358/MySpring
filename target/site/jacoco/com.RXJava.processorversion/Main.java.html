@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.RXJava.processorversion</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">package com.RXJava.processorversion;
+
+import java.util.concurrent.Flow;
+
+/**
+ * publisher.subscribe(Subscriber)
+ * -&gt; Subscriber.onSubscribe(Subscription(Subscribe, ...))
+ * 递归开始...
+ * -&gt; Subscription.request()
+ * -&gt; Subscription.TownProcessor.onNext()
+ * -&gt; Subscription.TempProcessor.onNext()
+ * -&gt; Subscription.Subscriber.onNext()
+ * -&gt; Subscriber.Subscription.request()
+ * 递归结束
+ * -&gt; Subscription.cancel()
+ * -&gt; Subscription.TownProcessor.onComplete()
+ * -&gt; Subscription.TempProcessor.onComplete()
+ * -&gt; Subscription.Subscriber.onComplete()
+ * 或者
+ * -&gt; Subscription.request()
+ * -&gt; Subscription.TownProcessor.onError()
+ * -&gt; Subscription.TempProcessor.onError()
+ * -&gt; Subscription.Subscriber.onError()
+ */
+
+<span class="nc" id="L26">public class Main {</span>
+    public static void main(String[] args) {
+
+        //                                              最下游的订阅者
+<span class="nc" id="L30">        getCelTempPublisher(&quot;Harbin&quot;).subscribe(new TempSubscriber());</span>
+<span class="nc" id="L31">    }</span>
+    public static Flow.Publisher&lt;TempInfo&gt; getCelTempPublisher(String town){ // 获取发布指定城镇天气的TempPublisher
+
+<span class="nc" id="L34">        return subscriber -&gt; {</span>
+<span class="nc" id="L35">                    TempProcessor tempProcessor = new TempProcessor();</span>
+<span class="nc" id="L36">                    tempProcessor.subscribe(subscriber); // TempProcessor - Subscriber</span>
+<span class="nc" id="L37">                    TownProcessor townProcessor = new TownProcessor();</span>
+<span class="nc" id="L38">                    townProcessor.subscribe(tempProcessor);</span>
+<span class="nc" id="L39">                    System.out.println(&quot;主线程：&quot; + Thread.currentThread().getName());</span>
+                    //     最上游的Publisher 委托给TempSubscription发布事件，指定其直接下游订阅者是townProcessor
+                    // 而递归调用 townProcessor/subscriber.onSubscribe(Subscription) 的最后是最下游的Subscriber
+                    // 持有了这个 指定Publisher的直接下游是最上游的Processor 的new TempSubscription(townProcessor, town)
+<span class="nc" id="L43">                    townProcessor.onSubscribe(new TempSubscription(townProcessor, town)); // Publisher - TempProcessor</span>
+                    // 最下游的Subscriber持有了1个Subscription，而这个Subscription持有的Processor是最上游的Processor
+                    // 即最下游Subscriber对象持有的Subscription.request()方法中的onNext(T)方法是从最上游的Processor.onNext()方法开始执行
+
+/**
+ * Publisher Processor Subscriber
+ *         Subscription
+ * 1.Processor.subscribe(Subscriber)最下游Subscriber自下而上向Processor先发起订阅，
+ *   使得上游Processor持有下游Subscriber
+ * 2.Processor.onSubscribe(Subscription(Processor))
+ *   Subscription：最上游的Publisher创建【包含最上游Processor的】Subscription对象
+ *   上游的Processor.onSubscribe，递归下游的Processor/Subscriber.onSubscribe(Subscription)方法，
+ *   最后调用最下游Subscribe.onSubscribe(Subscription)方法，将Subscription对象传递给最下游的Subscriber持有
+ * 3.最下游的Subscribe.onSubscribe(Subscription)方法时向Publisher(本质是向Subscription)发起request，
+ *   调用Subscription.request()方法；该方法中调用的是Publisher/Processor的直接下游Processor/Subscriber.onNext(T)方法，
+ *   即最下游Subscriber对象持有的Subscription.request()方法中的onNext(T)方法是从最上游的Processor.onNext()方法开始执行
+ *
+ */
+<span class="nc" id="L61">        };</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

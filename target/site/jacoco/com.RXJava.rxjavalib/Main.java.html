@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Main.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.RXJava.rxjavalib</a> &gt; <span class="el_source">Main.java</span></div><h1>Main.java</h1><pre class="source lang-java linenums">package com.RXJava.rxjavalib;
+
+import com.RXJava.processorversion.TempInfo;
+import io.reactivex.Observable;
+
+import java.util.concurrent.TimeUnit;
+
+/**
+ *
+ */
+<span class="nc" id="L11">public class Main {</span>
+    public static void main(String[] args) {
+
+        /***
+         * 仅使用一个接收事件的Consumer 【i -&gt; System.out.println(TempInfo.fetch(&quot;New York&quot;))】
+         * 实现 【onNext方法的】  Observer对象  订阅1个Observable；
+         * 其他onSubscriber、onError、onComplete方法都是用默认值,错误onError处理逻辑为空
+         */
+        // SimpleUse.simpleTest();
+        // 下面实现功能更为丰富的Observer 订阅Observable
+        // TempObservable.getTemperature(&quot;New York&quot;).blockingSubscribe(new TempObserver());
+        // TempObservable.getCelsiusTemperature(&quot;New York&quot;).blockingSubscribe(new TempObserver());
+        // TempObservable.getNegativeTemperature(&quot;New York&quot;).blockingSubscribe(new TempObserver());
+<span class="nc" id="L24">        System.out.println(&quot;=======================================================================&quot;);</span>
+        // merge Observable，合并处理 多个城市 每1秒的温度数据    【边长参数的传递】
+<span class="nc" id="L26">        TempObservable.getCelsiusTemperatures(&quot;beijing&quot;,&quot;changsha&quot;,&quot;shanghai&quot;)</span>
+<span class="nc" id="L27">                .blockingSubscribe(new TempObserver());</span>
+        // merge Observable输出结果（有待进一步理解，结果乱序，有时直接报异常-而不是按照代码写的输出Error！）
+        /*
+        *
+            摄氏度转换器                   &quot;beijing&quot;的Observable流
+            温度发射器
+
+            摄氏度转换器                   &quot;changsha&quot;的Observable流
+            温度发射器
+
+            摄氏度转换器                   &quot;shanghai&quot;的Observable流
+            温度发射器
+
+            发射温度                                beijing 的最上游Observable
+            发射温度                                changsha的最上游Observable
+            发射温度                                shanghai的最上游Observable
+
+            转换成摄氏度                             beijing 的第二个Observable
+            转换成摄氏度                             changsha的第二个Observable
+                                                   shanghai的第二个Observable 执行出错
+            TempInfo{town='shanghai', temp=-1}
+            TempInfo{town='beijing ', temp=1}
+            Error!
+        */
+
+<span class="nc" id="L52">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

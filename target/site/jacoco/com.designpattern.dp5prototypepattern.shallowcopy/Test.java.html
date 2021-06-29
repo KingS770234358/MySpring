@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Test.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.designpattern.dp5prototypepattern.shallowcopy</a> &gt; <span class="el_source">Test.java</span></div><h1>Test.java</h1><pre class="source lang-java linenums">package com.designpattern.dp5prototypepattern.shallowcopy;
+
+import java.util.ArrayList;
+import java.util.List;
+
+<span class="nc" id="L6">public class Test {</span>
+    public static void main(String[] args) {
+
+<span class="nc" id="L9">        ConcretePrototypeA ca = new ConcretePrototypeA(); // 具体的待克隆对象</span>
+<span class="nc" id="L10">        ca.setAge(18);</span>
+<span class="nc" id="L11">        ca.setName(&quot;prototype&quot;);</span>
+<span class="nc" id="L12">        List&lt;String&gt; hobbies = new ArrayList&lt;String&gt;();</span>
+<span class="nc" id="L13">        ca.setHobbies(hobbies);</span>
+<span class="nc" id="L14">        System.out.println(ca);</span>
+
+<span class="nc" id="L16">        Client c = new Client(ca); // 负责克隆的Client对象</span>
+<span class="nc" id="L17">        ConcretePrototypeA caCopy = (ConcretePrototypeA)c.startClone();</span>
+<span class="nc" id="L18">        System.out.println(caCopy);</span>
+
+<span class="nc" id="L20">        System.out.println(&quot;原对象的引用类型的属性的地址：&quot; + ca.getHobbies());</span>
+<span class="nc" id="L21">        System.out.println(&quot;克隆对象的引用类型的属性的地址：&quot; + caCopy.getHobbies());</span>
+        /**
+         * hobbies的引用地址是相同的，意味着复制的不是值，而是引用的地址。
+         * 如果修改任意一个对象的属性值，则 concretePrototype 和 concretePrototypeClone的hobbies值都会改变
+         *
+         * 浅克隆只是完整复制了值类型数据，没有赋值引用对象。换言之，所有的引用对象仍然指向原来的对象，
+         */
+<span class="nc bnc" id="L28" title="All 2 branches missed.">        System.out.println(&quot;对象地址比较：&quot; + (ca.getHobbies() == caCopy.getHobbies()));</span>
+
+<span class="nc" id="L30">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

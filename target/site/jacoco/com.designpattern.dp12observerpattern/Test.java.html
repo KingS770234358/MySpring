@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Test.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.designpattern.dp12observerpattern</a> &gt; <span class="el_source">Test.java</span></div><h1>Test.java</h1><pre class="source lang-java linenums">package com.designpattern.dp12observerpattern;
+
+/**
+ * 观察者模式
+ * 定义了对象之间的一对多依赖，让多个观察者对象同时监听一个主体对象。
+ * 当主体对象发生变化时，它的所有依赖者（观察者）都会收到通知并更新，属于行为型模式。
+ * 观察者模式也叫作发布订阅模式，主要用于在 关联行为之间 建立一套 触发机制 的场景。
+ *
+ * 示例：学生发布问题通知老师
+ *
+ * 优点：
+ * （1）在观察者和被观察者之间建立了一个抽象的耦合。
+ * （2）观察者模式支持广播通信。
+ * 缺点：
+ * （1）观察者之间有过多的细节依赖、时间消耗多，程序的复杂性更高。
+ * （2）使用不当会出现循环调用。
+ *
+ */
+<span class="nc" id="L19">public class Test {</span>
+    public static void main(String[] args) {
+<span class="nc" id="L21">        Student student = Student.getInstance();</span>
+<span class="nc" id="L22">        Teacher t1 = new Teacher(&quot;Tom&quot;);</span>
+<span class="nc" id="L23">        Teacher t2 = new Teacher(&quot;Mic&quot;);</span>
+
+<span class="nc" id="L25">        student.addObserver(t1);</span>
+<span class="nc" id="L26">        student.addObserver(t2);</span>
+
+        // 业务逻辑代码
+<span class="nc" id="L29">        Question q = new Question();</span>
+<span class="nc" id="L30">        q.setUserName(&quot;小明&quot;);</span>
+<span class="nc" id="L31">        q.setContent(&quot;观察者模式适用于哪些场景？&quot;);</span>
+
+<span class="nc" id="L33">        student.publishQuestion(q);</span>
+<span class="nc" id="L34">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

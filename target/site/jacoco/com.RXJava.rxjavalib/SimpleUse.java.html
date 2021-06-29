@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SimpleUse.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.RXJava.rxjavalib</a> &gt; <span class="el_source">SimpleUse.java</span></div><h1>SimpleUse.java</h1><pre class="source lang-java linenums">package com.RXJava.rxjavalib;
+
+import com.RXJava.processorversion.TempInfo;
+import io.reactivex.Observable;
+
+import java.util.concurrent.TimeUnit;
+
+<span class="nc" id="L8">public class SimpleUse {</span>
+    public static void simpleTest(){
+<span class="nc" id="L10">        Observable&lt;Long&gt; onePerSec = Observable.interval(1, TimeUnit.SECONDS);</span>
+        // 发布事件的线程是RxJava计算线程池中的守护线程，main线程执行完毕即被终止
+        // onePerSec.Subscribe( i-&gt; System.out.println(TempInfo.fetch(&quot;New York!&quot;)));
+        /*
+        *   仅使用一个接收事件的Consumer 【i -&gt; System.out.println(TempInfo.fetch(&quot;New York&quot;))】
+            实现 【onNext方法的】  Observer对象  订阅1个Observable；
+            其他onSubscriber、onError、onComplete方法都是用默认值,错误onError处理逻辑为空
+        * */
+        /*
+         *   这里的i 是onePerSec&lt;Long&gt; 每秒生成1个的递增序列
+         * */
+<span class="nc" id="L21">        onePerSec.blockingSubscribe( i-&gt; {</span>
+<span class="nc" id="L22">            System.out.print(&quot;i=&quot; + i + &quot; &quot;);</span>
+<span class="nc" id="L23">            System.out.println(TempInfo.fetch(&quot;New York!&quot;));</span>
+<span class="nc" id="L24">        });</span>
+        // ****************** 上述的Observable接收1个简单的Observer（只实现了onNext方法）来处理数据************
+<span class="nc" id="L26">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

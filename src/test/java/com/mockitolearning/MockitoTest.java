@@ -99,6 +99,12 @@ public class MockitoTest {
             return obj.equals(1) || obj.equals(2);
         }
     }
+//    class IsValid implements ArgumentMatcher<List> {
+//        @Override
+//        public boolean matches(List list) {
+//            return false;
+//        }
+//    }
     @Test
     public void matchAnyParameters(){
         List list = Mockito.mock(List.class);
@@ -122,6 +128,12 @@ public class MockitoTest {
             return((List)list).size()==3;
         }
     }
+//    class IsListofTwoElements implements ArgumentMatcher<List>{
+//        @Override
+//        public boolean matches(List list) {
+//            return false;
+//        }
+//    }
     @Test
     public void matchCustomizedParameters(){
         //创建mock对象

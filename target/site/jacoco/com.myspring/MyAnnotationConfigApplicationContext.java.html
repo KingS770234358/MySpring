@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MyAnnotationConfigApplicationContext.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.myspring</a> &gt; <span class="el_source">MyAnnotationConfigApplicationContext.java</span></div><h1>MyAnnotationConfigApplicationContext.java</h1><pre class="source lang-java linenums">package com.myspring;
+
+import com.myspring.Annotation.Autowired;
+import com.myspring.Annotation.Component;
+import com.myspring.Annotation.ComponentScan;
+import com.myspring.Annotation.Scope;
+import com.myspring.Aware.BeanNameAware;
+
+import java.io.File;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+
+/*
+* 基于注解配置的Spring容器类
+* */
+public class MyAnnotationConfigApplicationContext {
+
+    private Class configClass; // Spring容器的配置类
+
+<span class="nc" id="L24">    private List&lt;BeanPostProcessor&gt; beanPostProcessors = new ArrayList&lt;&gt;(); // 实现了BeanPostProcessor的类的列表</span>
+<span class="nc" id="L25">    private ConcurrentHashMap&lt;String, BeanDefinition&gt; beanDefinitionMap = new ConcurrentHashMap&lt;&gt;(); // bean定义池</span>
+<span class="nc" id="L26">    private ConcurrentHashMap&lt;String, Object&gt; singletonObjects = new ConcurrentHashMap&lt;&gt;(); // 单例池</span>
+
+    /**
+     * 构造函数
+     * @param configClass 配置类
+     */
+<span class="nc" id="L32">    public MyAnnotationConfigApplicationContext(Class configClass) throws Exception {</span>
+
+<span class="nc" id="L34">        this.configClass = configClass; // 保存配置类</span>
+
+        // 1.@ComponentScan注解---&gt;获得扫描路径---&gt;扫描---&gt;BeanDefinition---&gt;BeanDefinitionMap
+        // 1.1 获得所有实现beanPostProcessors的类，并存储
+        // 1.2 将所有bean的beanDefinition放入beanDefinitionMap
+<span class="nc" id="L39">        doScan(configClass);</span>
+
+        // 2.遍历BeanDefinitionMap，创建所有的单例bean
+<span class="nc bnc" id="L42" title="All 2 branches missed.">        for (String beanName : beanDefinitionMap.keySet()) {</span>
+<span class="nc" id="L43">            BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);</span>
+<span class="nc bnc" id="L44" title="All 4 branches missed.">            if(&quot;singleton&quot;.equals(beanDefinition.getScope()) &amp;&amp; !singletonObjects.containsKey(beanName)){</span>
+<span class="nc" id="L45">                Object o = createBean(beanName, beanDefinition); // 单例bean对象</span>
+<span class="nc" id="L46">                singletonObjects.put(beanName, o); // 放入单例对象</span>
+            }
+<span class="nc" id="L48">        }</span>
+<span class="nc" id="L49">    }</span>
+
+    /**
+     * 扫描配置类配置的路径下的所有Component
+     * @param configClass
+     * @throws Exception
+     */
+    private void doScan(Class configClass) throws Exception {
+        // 解析配置类@ComponentScan @Bean 针对配置类上的注解以及配置类内部方法上的注解
+        // 1.解析@ComponentScan注解---&gt;获得扫描路径---&gt;扫描
+        // 1.1 获取@ComponentScan注解
+<span class="nc" id="L60">        ComponentScan componentScan = (ComponentScan) configClass.getDeclaredAnnotation(ComponentScan.class);</span>
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if(componentScan == null)</span>
+<span class="nc" id="L62">            throw new Exception(&quot;请传入合法的Spring容器配置文件&quot;);</span>
+
+        // 1.2 通过componentScan注解的方法属性value获得配置的扫描路径
+<span class="nc" id="L65">        String scanPath = componentScan.value(); // com.wqiang.service</span>
+<span class="nc" id="L66">        scanPath = scanPath.replace(&quot;.&quot;,&quot;/&quot;); // 将 . 转化成 / 才能用于后面ClassLoader getResource</span>
+        // System.out.println(&quot;scanPath&quot; + scanPath);
+
+        // 1.3 根据得到的扫描路径 扫描指定路径下的带有@Component注解的类？ 类加载器！
+        /**
+         * BootStrap 启动类加载器  ---&gt;  加载类的路径jre/lib下的jar包和类
+         * Ext       扩展类加载器  ---&gt;  加载类的路径jre/ext/lib下的jar包和类
+         * App       应用类加载器  ---&gt;  加载类的路径classpath下的jar包和类
+         *                             （控制台启动参数中有一个-classpath参数）target/classes/
+         */
+<span class="nc" id="L76">        ClassLoader classLoader = MyAnnotationConfigApplicationContext.class.getClassLoader(); // 当前容器的类加载器App</span>
+        // 通过类加载器去 指定目录/文件 获得资源 相对路径-相对上述的classpath而言
+<span class="nc" id="L78">        URL resource = classLoader.getResource(scanPath); // 此处获得的resource是一个目录</span>
+<span class="nc" id="L79">        File file = new File(resource.getFile());</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        if(file.isDirectory()){ // 当前资源文件是一个目录</span>
+<span class="nc" id="L81">            File[] files = file.listFiles();</span>
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            for (File f: files) {</span>
+                // System.out.println(files[i]);
+<span class="nc" id="L84">                String fileName = f.getAbsolutePath();</span>
+<span class="nc bnc" id="L85" title="All 2 branches missed.">                if(!fileName.endsWith(&quot;.class&quot;)) // 只有类文件才进行处理</span>
+<span class="nc" id="L86">                    continue;</span>
+                // 抽取 类的全限定名
+                // xxx\com\wqiang\service\OrderService.class  === &gt;
+                // com.wqiang.service.OrderService
+<span class="nc" id="L90">                String className = fileName.substring(fileName.indexOf(&quot;com&quot;),fileName.indexOf(&quot;.class&quot;));</span>
+<span class="nc" id="L91">                className = className.replace(&quot;\\&quot;,&quot;.&quot;); // &quot;/&quot;转成&quot;.&quot;</span>
+                // System.out.println(className);
+                try {
+<span class="nc" id="L94">                    Class&lt;?&gt; clazz = classLoader.loadClass(className); // 通过类加载器加载对应的Class对象 类全限定名</span>
+<span class="nc bnc" id="L95" title="All 2 branches missed.">                    if(clazz.isAnnotationPresent(Component.class)){ // 扫描当前扫描到的类是否有Component注解 带有Component注解的才会被识别成一个bean注册到容器中</span>
+                        // 当前类是一个bean
+                        /**
+                         * 工作一、
+                         * 如果是BeanPostProcessor接口的实现类就要实例化，存起来（这里的实现不够严谨）
+                         * 判断一个Class对象是不是某个接口的实现 BeanPostProcessor.class.isAssignableFrom
+                         */
+<span class="nc bnc" id="L102" title="All 2 branches missed.">                        if(BeanPostProcessor.class.isAssignableFrom(clazz)){</span>
+                            // 源码中是通过 getBean()方法获取BeanPostProcessor的实例（这样的逻辑可以在BeanPostProcessor中进行注入
+<span class="nc" id="L104">                            BeanPostProcessor instance = (BeanPostProcessor)clazz.getDeclaredConstructor().newInstance();</span>
+<span class="nc" id="L105">                            beanPostProcessors.add(instance);</span>
+                        }
+                        // System.out.println(beanPostProcessors.size());
+                        /*
+                         * 工作二、
+                         * 创建每个bean的beanDefinition对象，存入BeanDefinitionMap，供之后的对象创建使用
+                         * 其他的bean是否扫描到就创建？
+                         * 判断bean的作用域：单例 原型
+                         * 单例需要用map存储 ConcurrentHashMap &lt;beanName, bean对象&gt; 单例池
+                         */
+                        // BeanDefinition
+<span class="nc" id="L116">                        Component componentAnnotation = clazz.getDeclaredAnnotation(Component.class);// beanName</span>
+<span class="nc" id="L117">                        String beanName = componentAnnotation.value();</span>
+<span class="nc" id="L118">                        BeanDefinition beanDefinition = new BeanDefinition();</span>
+<span class="nc" id="L119">                        beanDefinition.setClazz(clazz);</span>
+<span class="nc bnc" id="L120" title="All 2 branches missed.">                        if(clazz.isAnnotationPresent(Scope.class)){</span>
+<span class="nc" id="L121">                            Scope scopeAnnotation = clazz.getDeclaredAnnotation(Scope.class);</span>
+<span class="nc" id="L122">                            beanDefinition.setScope(scopeAnnotation.value());</span>
+<span class="nc" id="L123">                        }else{</span>
+                            //没有设置Scope 默认单例
+<span class="nc" id="L125">                            beanDefinition.setScope(&quot;singleton&quot;);</span>
+                        }
+<span class="nc" id="L127">                        beanDefinitionMap.put(beanName, beanDefinition);</span>
+                    }
+<span class="nc" id="L129">                } catch (ClassNotFoundException e) {</span>
+<span class="nc" id="L130">                    e.printStackTrace();</span>
+<span class="nc" id="L131">                }</span>
+
+            }
+        }
+<span class="nc" id="L135">    }</span>
+
+    /**
+     * 根据BeanDefinition的clazz属性创建对象
+     */
+    public Object createBean(String beanName, BeanDefinition beanDefinition){
+<span class="nc" id="L141">        Class clazz = beanDefinition.getClazz();</span>
+        try {
+            // 无参构造方法 反射构造对象
+<span class="nc" id="L144">            Object instance = clazz.getDeclaredConstructor().newInstance();</span>
+
+            // 只遍历属性，依赖注入
+<span class="nc bnc" id="L147" title="All 2 branches missed.">            for (Field declaredField : clazz.getDeclaredFields()) {</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">                if(declaredField.isAnnotationPresent(Autowired.class)){ // 该字段需要依赖注入</span>
+<span class="nc" id="L149">                    Autowired autowiredAnnotation = declaredField.getDeclaredAnnotation(Autowired.class);</span>
+                    // 简化 根据属性名 getBean()方法 到spring容器中搜索对应的bean
+<span class="nc" id="L151">                    Object o = getBean(declaredField.getName());</span>
+<span class="nc bnc" id="L152" title="All 4 branches missed.">                    if(o == null &amp;&amp; autowiredAnnotation.require()==true)</span>
+<span class="nc" id="L153">                        throw new Exception(&quot;属性：&quot; + declaredField.getName() + &quot;必须注入&quot;);</span>
+<span class="nc" id="L154">                    declaredField.setAccessible(true); // !!一定要将对象属性的访问权限设置为true 否则无法访问</span>
+<span class="nc" id="L155">                    declaredField.set(instance, o); // 反射给instance对象的字段赋值 依赖注入</span>
+                }
+            }
+
+            // Aware接口回调
+<span class="nc bnc" id="L160" title="All 2 branches missed.">            if(instance instanceof BeanNameAware){ // 实现了BeanNameAware接口</span>
+                // 让实现Aware接口的类获取自己在容器中的beanName
+<span class="nc" id="L162">                System.out.println(&quot;当前实例实现了BeanNameAware接口&quot;);</span>
+<span class="nc" id="L163">                ((BeanNameAware) instance).setBeanName(beanName); // 实现Aware接口的Bean一般是做一个持有容器的操作</span>
+            }
+
+            // 调用 BeanPostProcessor的初始化前方法 对正在实例化的对象instance进行加工
+            // 可以实现order接口或是添加@order注释来实现BeanPostProcessor执行顺序的排序
+<span class="nc bnc" id="L168" title="All 2 branches missed.">            for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {</span>
+<span class="nc" id="L169">                instance = beanPostProcessor.postProcessBeforeInitialization(instance, beanName);</span>
+<span class="nc" id="L170">            }</span>
+
+            // 初始化 InitializingBean
+<span class="nc bnc" id="L173" title="All 2 branches missed.">            if(instance instanceof InitializingBean){ // 实现了InitializingBean接口</span>
+                try {
+<span class="nc" id="L175">                    ((InitializingBean) instance).afterPropertySet();</span>
+<span class="nc" id="L176">                } catch (Exception e) {</span>
+<span class="nc" id="L177">                    e.printStackTrace();</span>
+<span class="nc" id="L178">                }</span>
+            }
+
+            // 调用 BeanPostProcessor的初始化后方法 对正在实例化的对象instance进行加工
+            // 可以实现order接口或是添加@order注释来实现BeanPostProcessor执行顺序的排序
+<span class="nc bnc" id="L183" title="All 2 branches missed.">            for (BeanPostProcessor beanPostProcessor : beanPostProcessors) {</span>
+<span class="nc" id="L184">                instance = beanPostProcessor.postProcessAfterInitialization(instance, beanName);</span>
+<span class="nc" id="L185">            }</span>
+
+<span class="nc" id="L187">            return instance;</span>
+<span class="nc" id="L188">        } catch (InstantiationException e) {</span>
+<span class="nc" id="L189">            e.printStackTrace();</span>
+<span class="nc" id="L190">        } catch (IllegalAccessException e) {</span>
+<span class="nc" id="L191">            e.printStackTrace();</span>
+<span class="nc" id="L192">        } catch (InvocationTargetException e) {</span>
+<span class="nc" id="L193">            e.printStackTrace();</span>
+<span class="nc" id="L194">        } catch (NoSuchMethodException e) {</span>
+<span class="nc" id="L195">            e.printStackTrace();</span>
+<span class="nc" id="L196">        } catch (Exception e) {</span>
+<span class="nc" id="L197">            e.printStackTrace();</span>
+<span class="nc" id="L198">        }</span>
+<span class="nc" id="L199">        return null;</span>
+    }
+
+    /**
+     * 根据beanName从Spring容器中获取bean对象的方法
+     * @param beanName
+     * @return 指定bean对象
+     */
+    public Object getBean(String beanName) throws Exception {
+
+<span class="nc bnc" id="L209" title="All 2 branches missed.">        if(beanDefinitionMap.containsKey(beanName)){ // 合法的beanName</span>
+
+<span class="nc" id="L211">            BeanDefinition beanDefinition = beanDefinitionMap.get(beanName);</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">            if(&quot;singleton&quot;.equals(beanDefinition.getScope())){</span>
+
+                // 创建过程中，需要注入的单例对象还未创建放入Ma（修改）
+<span class="nc bnc" id="L215" title="All 2 branches missed.">                if(!singletonObjects.containsKey(beanName)){</span>
+<span class="nc" id="L216">                    Object o = createBean(beanName, beanDefinition); // 单例bean对象</span>
+<span class="nc" id="L217">                    singletonObjects.put(beanName, o); // 放入单例对象</span>
+                }
+<span class="nc" id="L219">                return singletonObjects.get(beanName);</span>
+
+            }else{
+<span class="nc" id="L222">                return createBean(beanName, beanDefinition);</span>
+            }
+
+        }else{ // 非法的beanName
+<span class="nc" id="L226">            throw new Exception(&quot;不存在bean：&quot;+ beanName);</span>
+        }
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

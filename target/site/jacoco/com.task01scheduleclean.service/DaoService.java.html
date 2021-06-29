@@ -11,30 +11,30 @@ import java.time.Instant;
 import java.util.List;
 
 @Service
-<span class="fc" id="L14">public class DaoService {</span>
+<span class="nc" id="L14">public class DaoService {</span>
 
     @Autowired
     private ConsumerDao consumerDao;
 
     @Transactional
     public void insert(List&lt;Consumer&gt; consumers) throws InterruptedException {
-<span class="fc bfc" id="L21" title="All 2 branches covered.">        for(Consumer c : consumers){</span>
-<span class="fc" id="L22">            int insertRes =  consumerDao.insert(c);</span>
-<span class="fc" id="L23">            System.out.println(&quot;插入完毕，等待事务提交...&quot;);</span>
-<span class="fc" id="L24">            Thread.sleep(10000);</span>
-<span class="fc" id="L25">        }</span>
-<span class="fc" id="L26">    }</span>
+<span class="nc bnc" id="L21" title="All 2 branches missed.">        for(Consumer c : consumers){</span>
+<span class="nc" id="L22">            int insertRes =  consumerDao.insert(c);</span>
+<span class="nc" id="L23">            System.out.println(&quot;插入完毕，等待事务提交...&quot;);</span>
+<span class="nc" id="L24">            Thread.sleep(10000);</span>
+<span class="nc" id="L25">        }</span>
+<span class="nc" id="L26">    }</span>
     @Transactional
     public int delete(int[] cIds) {
-<span class="fc" id="L29">        int cnt = 0;</span>
-<span class="fc" id="L30">        Instant startTime = Instant.now();</span>
-<span class="fc bfc" id="L31" title="All 2 branches covered.">        for(int cId : cIds){</span>
-<span class="fc" id="L32">            cnt += consumerDao.delete(cId);</span>
+<span class="nc" id="L29">        int cnt = 0;</span>
+<span class="nc" id="L30">        Instant startTime = Instant.now();</span>
+<span class="nc bnc" id="L31" title="All 2 branches missed.">        for(int cId : cIds){</span>
+<span class="nc" id="L32">            cnt += consumerDao.delete(cId);</span>
         }
-<span class="fc" id="L34">        Instant endTime = Instant.now();</span>
+<span class="nc" id="L34">        Instant endTime = Instant.now();</span>
         // 45.97
-<span class="fc" id="L36">        System.out.println(&quot;开始时间：&quot; + startTime + &quot; &quot; + &quot;结束时间：&quot; + endTime + &quot; &quot; + &quot;运行时间：&quot; + Duration.between(startTime, endTime));</span>
-<span class="fc" id="L37">        return cnt;</span>
+<span class="nc" id="L36">        System.out.println(&quot;开始时间：&quot; + startTime + &quot; &quot; + &quot;结束时间：&quot; + endTime + &quot; &quot; + &quot;运行时间：&quot; + Duration.between(startTime, endTime));</span>
+<span class="nc" id="L37">        return cnt;</span>
     }
 }
-</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.2.201808211720</span></div></body></html>
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

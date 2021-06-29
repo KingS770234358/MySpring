@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>OrderServiceStaticProxy.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.designpattern.dp6proxypattern.staticproxyPlus</a> &gt; <span class="el_source">OrderServiceStaticProxy.java</span></div><h1>OrderServiceStaticProxy.java</h1><pre class="source lang-java linenums">package com.designpattern.dp6proxypattern.staticproxyPlus;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class OrderServiceStaticProxy implements IOrderService {
+
+<span class="nc" id="L8">    private SimpleDateFormat yearFormat = new SimpleDateFormat(&quot;yyyy&quot;);</span>
+    private IOrderService orderService;
+
+<span class="nc" id="L11">    public OrderServiceStaticProxy(IOrderService orderService){</span>
+<span class="nc" id="L12">        this.orderService = orderService;</span>
+<span class="nc" id="L13">    }</span>
+
+    @Override
+    public int createOrder(Order order) {
+<span class="nc" id="L17">        before(order);</span>
+<span class="nc" id="L18">        orderService.createOrder(order);</span>
+<span class="nc" id="L19">        after();</span>
+<span class="nc" id="L20">        return 0;</span>
+    }
+    public void before(Order order){ // 新增订单order时 需要确定要插入的数据 才能调用orderDao.createOrder()方法
+<span class="nc" id="L23">        System.out.println(&quot;增强前操作&quot;);</span>
+<span class="nc" id="L24">        Long time = order.getCreateTime();</span>
+        // 根据订单的年份确定数据源
+<span class="nc" id="L26">        Integer dbRouter = Integer.valueOf(yearFormat.format(new Date(time)));</span>
+<span class="nc" id="L27">        System.out.println(&quot;静态代理类自动分配到：【DB_&quot; + dbRouter + &quot;】数据源处理数据&quot;);</span>
+<span class="nc" id="L28">        DynamicDataSourceEntry.set(dbRouter);</span>
+<span class="nc" id="L29">    }</span>
+    public void after(){
+<span class="nc" id="L31">        System.out.println(&quot;增强后操作&quot;);</span>
+<span class="nc" id="L32">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

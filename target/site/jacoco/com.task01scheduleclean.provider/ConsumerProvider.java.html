@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ConsumerProvider.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.task01scheduleclean.provider</a> &gt; <span class="el_source">ConsumerProvider.java</span></div><h1>ConsumerProvider.java</h1><pre class="source lang-java linenums">package com.task01scheduleclean.provider;
+
+//import com.github.pagehelper.util.StringUtil;
+import com.task01scheduleclean.pojo.Consumer;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.jdbc.SQL;
+
+import java.util.List;
+import java.util.Map;
+
+<span class="nc" id="L11">public class ConsumerProvider {</span>
+
+    /**
+     * 单个参数的动态查询
+     * 【重点】：动态条件（注意参数需要使用 final 修饰，以便return new中的匿名内部类对它们进行访问）
+     * @param name
+     * @return
+     */
+    public static String getConsumerByNameDynamicSingleParam(final String name) {
+<span class="nc" id="L20">        return new SQL(){{</span>
+<span class="nc" id="L21">            SELECT(&quot;*&quot;);</span>
+<span class="nc" id="L22">            FROM(&quot;consumer&quot;);</span>
+<span class="nc bnc" id="L23" title="All 2 branches missed.">            if (name != null) {</span>
+                // MyBatis中#{xxx}不能拼接！！！
+<span class="nc" id="L25">                WHERE(&quot;name like #{name}&quot;);</span>
+            }
+<span class="nc" id="L27">            ORDER_BY(&quot;id&quot;);</span>
+<span class="nc" id="L28">        }}.toString();</span>
+    }
+
+    /**
+     *
+     * @param name
+     * @param orderByColumn
+     * @return
+     */
+    // 参数列表不使用 @Param，参数列表的定义就必须与 mapper/dao 方法完全相同
+    public static String getConsumerByNameDynamicMultiParam(
+            final String name, final String orderByColumn) {
+<span class="nc" id="L40">        return new SQL(){{</span>
+<span class="nc" id="L41">            SELECT(&quot;*&quot;);</span>
+<span class="nc" id="L42">            FROM(&quot;consumer&quot;);</span>
+<span class="nc" id="L43">            WHERE(&quot;name like #{name}&quot;);</span>
+<span class="nc" id="L44">            ORDER_BY(orderByColumn);</span>
+<span class="nc" id="L45">        }}.toString();</span>
+    }
+
+    // 参数列表使用 @Param，参数列表的定义就可以与 mapper/dao 方法不同，可以只定义需要使用的参数
+    public static String getConsumerByNameDynamicMultiParam3(@Param(&quot;orderByColumn&quot;) final String orderByColumn) {
+<span class="nc" id="L50">        return new SQL(){{</span>
+<span class="nc" id="L51">            SELECT(&quot;*&quot;);</span>
+<span class="nc" id="L52">            FROM(&quot;consumer&quot;);</span>
+            // WHERE(&quot;name like #{name}&quot;);
+<span class="nc" id="L54">            ORDER_BY(orderByColumn);</span>
+<span class="nc" id="L55">        }}.toString();</span>
+    }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

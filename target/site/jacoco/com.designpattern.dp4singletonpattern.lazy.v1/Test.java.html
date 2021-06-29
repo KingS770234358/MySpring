@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Test.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.designpattern.dp4singletonpattern.lazy.v1</a> &gt; <span class="el_source">Test.java</span></div><h1>Test.java</h1><pre class="source lang-java linenums">package com.designpattern.dp4singletonpattern.lazy.v1;
+
+/**
+ * 步骤一：创建单例对象
+ * if(lazy==null){
+ *     lazy = new LazySimpleSingleton();
+ * }
+ *
+ * 步骤二：接收单例对象
+ * LazySimpleSingleton singleton = LazySimpleSingleton.getInstance();
+ *
+ * 两个线程同时进入步骤一的if语句块的情况下：
+ * 如果线程1先跑完了剩下的所有代码，再是线程2跑完剩下所有代码，则会产生两个不同的单例对象，单例存在线程安全隐患。
+ * 如果线程1先执行的步骤一，然后在步骤二执行之前等待；然后线程2执行步骤一，则线程1在接收单例对象的时候，自己创建的
+ * 单例对象已经被线程2的单例对象覆盖，导致线程1和线程2在步骤二接收到的单例对象都是相同的单例对象，线程安全隐患依旧存在。
+ */
+<span class="nc" id="L17">public class Test {</span>
+    public static void main(String[] args) {
+<span class="nc" id="L19">        Thread t1 = new Thread(new ExecutorThread());</span>
+<span class="nc" id="L20">        Thread t2 = new Thread(new ExecutorThread());</span>
+<span class="nc" id="L21">        t1.start();</span>
+<span class="nc" id="L22">        t2.start();</span>
+<span class="nc" id="L23">        System.out.println(&quot;End...&quot;);</span>
+<span class="nc" id="L24">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Colors.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.designpattern.dp4singletonpattern.register.EnumSingleton</a> &gt; <span class="el_source">Colors.java</span></div><h1>Colors.java</h1><pre class="source lang-java linenums">package com.designpattern.dp4singletonpattern.register.EnumSingleton;
+
+<span class="nc" id="L3">public enum Colors {</span>
+    // 枚举使用&quot;,&quot;分割
+<span class="nc" id="L5">    RED(1),GREEN(2),BLUE(3){</span>
+        public boolean isRest(){
+<span class="nc" id="L7">            return true;</span>
+        }
+    };
+    private int value;
+<span class="nc" id="L11">    private Colors(int i) {</span>
+<span class="nc" id="L12">        this.value = i;</span>
+<span class="nc" id="L13">    }</span>
+    public int getValue(){
+<span class="nc" id="L15">        return this.value;</span>
+    }
+    public boolean isRest(){
+<span class="nc" id="L18">        return false;</span>
+    }
+
+    public static Colors getColorById(int id){
+<span class="nc bnc" id="L22" title="All 2 branches missed.">        for (Colors value : Colors.values()) {</span>
+<span class="nc bnc" id="L23" title="All 2 branches missed.">            if(value.getValue() == id){</span>
+<span class="nc" id="L24">                return value;</span>
+            }
+        }
+<span class="nc" id="L27">        return null;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>MySchedulerJob.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.task01scheduleclean.job</a> &gt; <span class="el_source">MySchedulerJob.java</span></div><h1>MySchedulerJob.java</h1><pre class="source lang-java linenums">package com.task01scheduleclean.job;
+
+import com.task01scheduleclean.dao.ConsumerDao;
+import com.task01scheduleclean.pojo.Consumer;
+import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import java.util.List;
+
+@Component
+<span class="nc" id="L14">public class MySchedulerJob {</span>
+
+    /**
+     * 用于访问数据库的SqlSessionFactory
+     */
+    @Autowired
+    private SqlSessionFactory sqlSessionFactory;
+
+    @Scheduled(cron = &quot;*/1 * * * * ?&quot;)
+    public void jobTest(){
+//        SqlSession sqlSession = sqlSessionFactory.openSession();
+//        ConsumerDao consumerDao = sqlSession.getMapper(ConsumerDao.class);// 使用SqlSession获取Dao的代理对象
+//        List&lt;Consumer&gt; all = consumerDao.getAll();
+//        System.out.println(all.get(0));
+
+        /*
+        String filePath = &quot;E:\\workspace\\MySpring\\src\\main\\resources\\schedulerTest.txt&quot;;
+        File f = new File(filePath);
+        try{
+            if(!f.exists()){
+                f.createNewFile();
+            }
+            FileWriter fw = new FileWriter(filePath, true);
+            fw.write(&quot;任务调度测试 &quot; + new Date().toString() + &quot;\r\n&quot;);
+            fw.close();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+        */
+<span class="nc" id="L43">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

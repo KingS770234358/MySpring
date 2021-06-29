@@ -3,17 +3,25 @@ package com.task01scheduleclean.dao;
 import com.task01scheduleclean.pojo.Consumer;
 import com.task01scheduleclean.provider.ConsumerProvider;
 import com.task01scheduleclean.provider.ConsumerProvider2;
-import org.apache.ibatis.annotations.*;
+import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.CacheNamespace;
+import org.apache.ibatis.annotations.SelectKey;
+import org.apache.ibatis.annotations.Select;
+import org.apache.ibatis.annotations.Results;
+import org.apache.ibatis.annotations.Result;
+import org.apache.ibatis.annotations.Many;
+import org.apache.ibatis.annotations.ResultMap;
+import org.apache.ibatis.annotations.Delete;
+import org.apache.ibatis.annotations.Param;
+import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Update;
+import org.apache.ibatis.annotations.SelectProvider;
 import org.apache.ibatis.mapping.FetchType;
-import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
 
 @Mapper
-@Component
 @CacheNamespace(blocking = true) // blocking 默认为false 不开启二级缓存
 public interface ConsumerDao {
 
@@ -24,11 +32,11 @@ public interface ConsumerDao {
      * 否则 不对应的字段会 成null ==== Consumer(id=2, consumerName=null, address=fuzhou, sex=男, birthday=2021-06-21)
      * 可以指定id属性，给Result起别名，然后在别的地方使用@ResultMap引用
      */
-    @Results(id = "consumerToDB",value = {
+    @Results(id = "consumerToDB", value = {
             // 这里要指定id=true，否则在主键自增的情况下 主键会为0（默认值）
             @Result(id = true, property = "id", column = "id", javaType = java.lang.Integer.class),
             @Result(property = "consumerName", column = "name", javaType = java.lang.String.class),
-            @Result(property = "accountList", column = "id", // 这里的id是 账户表的 id？
+            @Result(property = "accountList", column = "consumerId", // 这里的id是 账户表的 id？
                 // many 属性描述一对多的关系，一个消费者可以有多个账户，使用@Many注解指定如何查找账户列表，
                 many = @Many(select = "com.task01scheduleclean.dao.AccountDao.getAccountByConsumerId", fetchType = FetchType.LAZY))})
     List<Consumer> getAll();
@@ -54,25 +62,25 @@ public interface ConsumerDao {
     int[] getConsumerIdsByBirthdayWithLimitation(int interval, int limitation);
 
     // 方式一、先查后删
-    @Delete("<script>" +
-                "DELETE from consumer where" +
-                "<foreach collection='cIds' item='cId' separator=' or '>" +
-                    "id=#{cId}" +
-                "</foreach>" +
-            "</script>")
+    @Delete("<script>"
+            + "DELETE from consumer where"
+            +   "<foreach collection='cIds' item='cId' separator=' or '>"
+            +        "id=#{cId}"
+            +    "</foreach>"
+            + "</script>")
     int deleteBatch(@Param("cIds")int[] cIds);
 
-    @Delete("<script>" +
-            "DELETE from consumer where id in" +
-            "<foreach collection='cIds' item='cId' separator=',' open='(' close=')'>" +
-            "#{cId}" +
-            "</foreach>" +
-            "</script>")
+    @Delete("<script>"
+            + "DELETE from consumer where id in"
+            + "<foreach collection='cIds' item='cId' separator=',' open='(' close=')'>"
+            + "#{cId}"
+            + "</foreach>"
+            + "</script>")
     int deleteBatch2(@Param("cIds")int[]cIds);
     // 方式二、查完即删
-    @Delete("DELETE FROM consumer WHERE id in (SELECT a.cId from (SELECT id as cId from consumer " +
+    @Delete("DELETE FROM consumer WHERE id in (SELECT a.cId from (SELECT id as cId from consumer "
             // 在#{}中指定jdbcType进行 java的Date类型到jdbc TIMESTAMP的转换 这样才能比较
-            "where birthday <= #{date,jdbcType=TIMESTAMP} limit #{limitation}) as a)")
+            + "where birthday <= #{date,jdbcType=TIMESTAMP} limit #{limitation}) as a)")
     int deleteBatch3(Date date, int limitation);
 
 
@@ -91,6 +99,7 @@ public interface ConsumerDao {
      *   在Provider的方法参数列表中不使用@Param注解
      *   在查询时，指定按什么属性排序
      * @param name
+     * @param orderByColumn
      * @return
      */
     @SelectProvider(type = ConsumerProvider.class, method = "getConsumerByNameDynamicMultiParam")
@@ -103,6 +112,7 @@ public interface ConsumerDao {
      *   【在Provider的方法参数列表中使用@Param注解】
      *   在查询时，指定按什么属性排序
      * @param name
+     * @param orderByColumn
      * @return
      */
     @SelectProvider(type = ConsumerProvider.class, method = "getConsumerByNameDynamicMultiParam3")
@@ -112,6 +122,7 @@ public interface ConsumerDao {
     /**
      * 4.Provider实现ProviderMethodResolver接口，实现 Provider中SQL语句获取方法 与 Dao中被标注方法的自动匹配，
      *   而不需要使用@XXXProvider的method属性指定
+     * @param name
      */
     @SelectProvider(type = ConsumerProvider2.class)
     @ResultMap(value = {"consumerToDB"})
@@ -120,20 +131,19 @@ public interface ConsumerDao {
 
 
     // 新增
-
     /**
      * 批量新增
      * @param consumers
      * @return
      */
-    @Insert("<script> " +
-            "insert into consumer " +
-            "(name, address, sex, birthday) " +
-            "values " +
-            "<foreach collection='consumers' item='consumer' separator=','>" +
-            "(#{consumer.consumerName},#{consumer.address},#{consumer.sex},#{consumer.birthday})"+
-            "</foreach> " +
-            "</script>")
+    @Insert("<script> "
+            + "insert into consumer "
+            + "(name, address, sex, birthday) "
+            + "values "
+            + "<foreach collection='consumers' item='consumer' separator=','>"
+            + "(#{consumer.consumerName},#{consumer.address},#{consumer.sex},#{consumer.birthday})"
+            + "</foreach> "
+            + "</script>")
     int batchInsert(@Param("consumers") List<Consumer> consumers);
     @Insert("insert into consumer(id, name,address,sex,birthday) values(#{id}, #{consumerName}, #{address},#{sex},#{birthday})")
     /**
@@ -151,9 +161,9 @@ public interface ConsumerDao {
     @Delete("DELETE FROM consumer WHERE id =#{id}")
     int delete(int id);
     // 表的嵌套 == 再看看代码的DAO
-    @Delete("DELETE FROM consumer WHERE id in (SELECT a.cId from (SELECT id as cId from consumer " +
+    @Delete("DELETE FROM consumer WHERE id in (SELECT a.cId from (SELECT id as cId from consumer "
             // 在#{}中指定jdbcType进行 java的Date类型到jdbc TIMESTAMP的转换 这样才能比较
-            "where birthday <= #{date,jdbcType=TIMESTAMP} limit 100000) as a)")
+            + "where birthday <= #{date,jdbcType=TIMESTAMP} limit 100000) as a)")
     void deleteRange(Date date);
     @Delete("DELETE * FROM consumer")
     void deleteAll();

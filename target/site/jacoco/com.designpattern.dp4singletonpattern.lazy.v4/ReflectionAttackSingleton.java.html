@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ReflectionAttackSingleton.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.designpattern.dp4singletonpattern.lazy.v4</a> &gt; <span class="el_source">ReflectionAttackSingleton.java</span></div><h1>ReflectionAttackSingleton.java</h1><pre class="source lang-java linenums">package com.designpattern.dp4singletonpattern.lazy.v4;
+
+import java.lang.reflect.Constructor;
+
+/**
+ * 使用反射进行单例破坏
+ */
+<span class="nc" id="L8">public class ReflectionAttackSingleton {</span>
+    public static void main(String[] args) {
+
+        // 获取单例类对象
+<span class="nc" id="L12">        Class&lt;?&gt; clazz = LazyInnerClassSingleton.class;</span>
+        try {
+            // 通过反射获取私有的构造方法
+<span class="nc" id="L15">            Constructor c = clazz.getDeclaredConstructor(null);</span>
+            // 强制访问
+<span class="nc" id="L17">            c.setAccessible(true);</span>
+            // 暴力初始化 两次
+<span class="nc" id="L19">            Object o1 = c.newInstance();</span>
+<span class="nc" id="L20">            Object o2 = c.newInstance();</span>
+<span class="nc bnc" id="L21" title="All 2 branches missed.">            System.out.println(o1==o2); // 返回false 相当于有两个单例对象</span>
+<span class="nc" id="L22">        } catch (Exception e) {</span>
+<span class="nc" id="L23">            e.printStackTrace();</span>
+<span class="nc" id="L24">        }</span>
+
+<span class="nc" id="L26">    }</span>
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

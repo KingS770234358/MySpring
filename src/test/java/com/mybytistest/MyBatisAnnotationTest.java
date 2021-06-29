@@ -5,7 +5,7 @@ import com.task01scheduleclean.dao.AccountDao;
 import com.task01scheduleclean.dao.ConsumerDao;
 import com.task01scheduleclean.pojo.Account;
 import com.task01scheduleclean.pojo.Consumer;
-import com.task01scheduleclean.service.DaoService;
+import com.task01scheduleclean.service.ConsumerService;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.junit.After;
@@ -26,14 +26,14 @@ public class MyBatisAnnotationTest {
     private SqlSessionFactory sqlSessionFactory;
     private SqlSession sqlSession;
     private ConsumerDao consumerDao;
-    private DaoService daoService;
+    private ConsumerService consumerService;
     @Before
     public void getDaoProxy(){
         ApplicationContext ac = SpringApplication.run(SchedulerApplication.class);
         this.sqlSessionFactory = ac.getBean(SqlSessionFactory.class); // SqlSessionFactory工厂
         this.sqlSession = this.sqlSessionFactory.openSession(); // SqlSession
         this.consumerDao = sqlSession.getMapper(ConsumerDao.class);// 使用SqlSession获取Dao的代理对象
-        this.daoService = ac.getBean(DaoService.class);
+        this.consumerService = ac.getBean(ConsumerService.class);
     }
     @After
     public void closeSqlSession(){
@@ -53,7 +53,7 @@ public class MyBatisAnnotationTest {
         consumers.add(c1);
 //        consumers.add(c2);
 //        consumers.add(c3);
-        this.daoService.insert(consumers);
+        this.consumerService.insert(consumers);
     }
 
     /**
@@ -84,7 +84,7 @@ public class MyBatisAnnotationTest {
         while(delNum>=limitation){
             int[] cIds = consumerDao.getConsumerIdsByBirthdayWithLimitation(1, limitation);
             System.out.println("查到：" + cIds.length + "条数据。");
-            delNum = daoService.delete(cIds);
+            delNum = consumerService.delete(cIds);
             System.out.println("删除：" + delNum + "条数据。");
         }
     }
@@ -218,6 +218,8 @@ public class MyBatisAnnotationTest {
     public void getAccountByIdTest(){
         AccountDao accountDao = sqlSession.getMapper(AccountDao.class);
         Account account = accountDao.getAccountById(1);
+        List<Account> c = accountDao.getAccountByConsumerId(2);
+        System.out.println(c.size());
         System.out.println(account);
     }
 
@@ -233,6 +235,14 @@ public class MyBatisAnnotationTest {
     public void getFuzzyTest(){
         List<Consumer> all = consumerDao.getFuzzy("%w%");
         System.out.println(all.get(0));
+    }
+    /**
+     * 按Id获取消费者
+     */
+    @Test
+    public void getConsumerByIdTest(){
+        Consumer c = consumerDao.getConsumerById(2);
+        System.out.println(c);
     }
     /**
      * 新增消费者

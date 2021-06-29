@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>LazyDoubleCheckSingleton.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.designpattern.dp4singletonpattern.lazy.v3</a> &gt; <span class="el_source">LazyDoubleCheckSingleton.java</span></div><h1>LazyDoubleCheckSingleton.java</h1><pre class="source lang-java linenums">package com.designpattern.dp4singletonpattern.lazy.v3;
+
+/**
+ *  双检锁单例模式
+ *  懒汉式单例模式 只有在外部用到的时候 内部类 才会加载
+ */
+public class LazyDoubleCheckSingleton {
+    private LazyDoubleCheckSingleton(){}
+    // 静态块 内存公共区域
+    // lazy要使用volatile关键字 禁止指令重排序
+<span class="nc" id="L11">    private volatile static LazyDoubleCheckSingleton lazy = null;</span>
+    // 尽量不加锁，只在lazy==null时加锁，减少加锁。
+    // 在单例对象不为空的情况下就不用加锁，可以直接返回单例对象。
+    public static LazyDoubleCheckSingleton getInstance(){
+<span class="nc bnc" id="L15" title="All 2 branches missed.">        if(lazy==null){</span>
+<span class="nc" id="L16">            synchronized (LazyDoubleCheckSingleton.class){</span>
+<span class="nc bnc" id="L17" title="All 2 branches missed.">                if(lazy==null){</span>
+                    // 1.分配内存 2.初始化对象 3.设置lazy指向分配的内存区域
+                    // lazy要使用volatile关键字 禁止指令重排序
+<span class="nc" id="L20">                    lazy = new LazyDoubleCheckSingleton();</span>
+                }
+<span class="nc" id="L22">            }</span>
+        }
+<span class="nc" id="L24">        return lazy;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="zh"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SeriableSingleton.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">MySpring</a> &gt; <a href="index.source.html" class="el_package">com.designpattern.dp4singletonpattern.register</a> &gt; <span class="el_source">SeriableSingleton.java</span></div><h1>SeriableSingleton.java</h1><pre class="source lang-java linenums">package com.designpattern.dp4singletonpattern.register;
+
+import java.io.Serializable;
+
+/***
+ * 反序列化后的单例对象会重新分配内存，即重新创建，违背了单例模式的初衷
+ * [ObjectInputStream类的readObject()方法]
+ * 增加readResolve（）方法返回实例解决了单例模式被破坏的问题，但是实际上实例化了两次，只不
+ * 过新创建的对象没有被返回而已。如果创建对象的动作发生频率加快，就意味着内存分配开销也会随之增大，
+ */
+public class SeriableSingleton implements Serializable {
+<span class="nc" id="L12">    private final static SeriableSingleton INSTANCE = new SeriableSingleton();</span>
+    // 只要有无参构造方法，在反序列的时候就会实例化
+    private SeriableSingleton(){}
+    public static SeriableSingleton getInstance(){
+<span class="nc" id="L16">        return INSTANCE;</span>
+    }
+
+    /**
+     * 通过反射找到一个无参的 readResolve()法
+     * @return
+     */
+    private Object readResovle(){
+<span class="nc" id="L24">        return INSTANCE;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.0.201801022044</span></div></body></html>
