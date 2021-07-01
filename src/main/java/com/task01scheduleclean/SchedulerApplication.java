@@ -12,7 +12,6 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableScheduling
 @MapperScan("com.task01scheduleclean.dao")
 @EnableTransactionManagement
-@ComponentScan("com.task01scheduleclean.*")
 public class SchedulerApplication {
 
     public static void main(String[] args) throws InterruptedException {

@@ -24,6 +24,20 @@
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
     <dependencies>
+        <!-- MapStruct依赖 -->
+        <!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>1.3.1.Final</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/org.mapstruct/mapstruct-processor -->
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct-processor</artifactId>
+            <version>1.3.1.Final</version>
+        </dependency>
+
         <!-- mockito依赖 -->
         <!-- https://mvnrepository.com/artifact/org.mockito/mockito-all -->
         <dependency>
@@ -68,11 +82,13 @@
             <version>2.1.1</version>
         </dependency>
         <!-- mybatis分页插件 -->
-<!--        <dependency>-->
-<!--            <groupId>com.github.pagehelper</groupId>-->
-<!--            <artifactId>pagehelper-spring-boot-starter</artifactId>-->
-<!--            <version>1.1.1</version>-->
-<!--        </dependency>-->
+        <!-- https://mvnrepository.com/artifact/com.github.pagehelper/pagehelper-spring-boot-starter -->
+        <dependency>
+            <groupId>com.github.pagehelper</groupId>
+            <artifactId>pagehelper-spring-boot-starter</artifactId>
+            <version>1.3.0</version>
+        </dependency>
+
         <!-- 下面这些是SpringBoot官方的 -->
         <!-- jdbc启动器 -->
         <dependency>
@@ -111,6 +127,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
+            <version>1.18.6</version>
         </dependency>
         <!-- druid数据源使用的log4j日志 -->
         <dependency>
@@ -118,7 +135,14 @@
             <artifactId>log4j</artifactId>
             <version>1.2.17</version>
         </dependency>
-
+        <!-- logback日志依赖 -->
+        <!-- https://mvnrepository.com/artifact/ch.qos.logback/logback-classic -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
+            <scope>test</scope>
+        </dependency>
         <!-- 动态代理的依赖 -->
         <!-- https://mvnrepository.com/artifact/net.sourceforge.cglib/com.springsource.net.sf.cglib -->
         <dependency>
@@ -181,7 +205,6 @@
                     </execution>
                 </executions>
             </plugin>
-            <!--检查代码覆盖率的插件配置-->
             <!--检查代码覆盖率的插件配置-->
             <plugin>
                 <groupId>org.jacoco</groupId>

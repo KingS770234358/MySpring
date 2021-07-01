@@ -44,3 +44,14 @@ mybatis:
   configuration:
     cache-enabled: true
 
+# 配置pagehelper分页插件
+pagehelper:
+  helperDialect: mysql
+  # 关于reasonable参数：
+  # true，如果pageNum<1会查询第一页，如果pageNum>pages会查询最后一页，
+  #       即当页数超出数据库的数量时, mybatis还是返回最后一页的数据
+  # false，如果pageNum<1或pageNum>pages会返回空数据
+  # 在实际web项目中，为了在用户输入超出页面范围的页号也可以返回正常的数据，需要将reasonable设置为true
+  reasonable: false
+  support-methods-arguments: true
+  params-count: countSql

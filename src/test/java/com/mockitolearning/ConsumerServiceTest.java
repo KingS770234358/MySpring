@@ -32,6 +32,8 @@ public class ConsumerServiceTest {
      *    如果其中调用了 某个被注入的引用属性的某个方法， 但该引用属性没有具体设置则会抛出空指针异常
      *    如此处consumerService中的accountDao
      *    因此需要将其中所有用到的 被注入的引用属性 都mock
+     *
+     *
      * 2. 当只有@Autowired注解的情况下，该对象中所有用到的方法都是真实的，此处设置的mock预设都会失效
      * 3. 当同时有@InjectMocks和@Autowired注解的情况下：
      * @InjectMocks 注解在上方，且 consumerDao 为 @Mock 所修饰：使用的都是真实方法，mock无效
@@ -40,6 +42,7 @@ public class ConsumerServiceTest {
      * @InjectMocks 注解在下方，且 consumerDao 为 @Mock 所修饰：使用的都是真实方法，mock无效
      * @InjectMocks 注解在下方，且 consumerDao 为 @Autowired 所修饰：
      * consumerDao为真实对象，无法进行mock的预设，会抛出异常
+     *
      * 4. 保留部分真实方法，只模拟部分方法
      * 如 类A 依赖 类B 和 类C，此时只mock C的方法，可以
      * - @Autowired标注类A ，然后@Mock标注类C，在@Before中使用A对于C的setter方法将 mock的C类设置到真实的A类中
@@ -65,7 +68,7 @@ public class ConsumerServiceTest {
     @Mock
     private ConsumerDao consumerDao;
 
-    @Autowired
+    @Mock
     private AccountDao accountDao; // 要测试的类当中用到的其他类 预设/模拟这些类的某些行为
 
     //@Autowired
@@ -91,7 +94,7 @@ public class ConsumerServiceTest {
         /**
          * 保留部分真实方法，只模拟部分方法 方案二、 多声明1个 @Mock标注的C 才可以对C进行 mock预设
          */
-        consumerService.setAccountDao(accountDao);
+        // consumerService.setAccountDao(accountDao);
     }
     @After
     public void tearDown(){
